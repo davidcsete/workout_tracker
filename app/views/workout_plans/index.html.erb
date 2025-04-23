@@ -1,0 +1,27 @@
+<!-- app/views/workout_plans/index.html.erb -->
+<h1>Your Workout Plans</h1>
+<br>
+  <%= link_to "Add New Plan", new_workout_plan_path, class: "btn btn-primary" %>
+<br>
+<%= turbo_frame_tag "workout_plans" do %>
+  <div class="workout-plans">
+    <ul class="space-y-4">
+      <% @workout_plans.each do |plan| %>
+        <li class="border p-4 rounded-xl shadow-md">
+          <h2 class="text-xl font-semibold"><%= plan.name %></h2>
+          <p>Created by: <%= plan.user.username %></p>
+          <%= turbo_stream.append 'workout_plans' do %>
+            <%= render partial: 'workout_plans/workout_plan', locals: { workout_plan: plan } %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+    <% @workout_plans.each do |plan| %>
+      
+      <div class="workout-plan">
+        <h3><%= plan.name %></h3>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+

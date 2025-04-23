@@ -1,0 +1,13 @@
+<!-- app/views/workout_plans/new.html.erb -->
+<h1>Create New Workout Plan</h1>
+
+<%= form_with model: @workout_plan, local: false do |form| %>
+  <div>
+    <%= form.label :name %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div>
+    <%= form.submit "Create Plan" %>
+  </div>
+<% end %>

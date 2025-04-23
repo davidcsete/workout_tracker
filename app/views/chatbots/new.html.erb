@@ -1,0 +1,12 @@
+<h3 class="mt-4 font-bold">Chat with your AI trainer</h3>
+
+<%= form_with url: chatbots_path, method: :post, data: { turbo_frame: "_top" } do |f| %>
+  <div class="mb-2">
+    <%= f.text_area :message, rows: 2, class: "w-full p-2 rounded" %>
+  </div>
+  <%= f.submit "Ask", class: "px-4 py-2 bg-blue-600 text-white rounded" %>
+<% end %>
+
+<div id="chatbot_response" class="mt-4 space-y-2">
+  <!-- AI replies will stream here -->
+</div>

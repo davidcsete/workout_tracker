@@ -1,0 +1,35 @@
+<div class="p-4">
+  <h1 class="text-2xl font-bold mb-4">🏋️ Your Workout Dashboard</h1>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-white p-4 rounded shadow">
+      <h2 class="text-lg font-semibold">Total Exercises Tracked</h2>
+      <p class="text-2xl"><%= current_user.exercise_trackings.count %></p>
+    </div>
+    <div class="bg-white p-4 rounded shadow">
+      <h2 class="text-lg font-semibold">Total Weight Lifted (kg)</h2>
+      <p class="text-2xl">
+        <%= current_user.exercise_trackings.sum(:weight) %>
+      </p>
+    </div>
+    <div class="bg-white p-4 rounded shadow">
+      <h2 class="text-lg font-semibold">Recent Workout Plan</h2>
+      <% if (recent = current_user.workout_plans.last) %>
+        <p><%= link_to recent.name, workout_plan_exercises_path(recent), class: "underline text-blue-500" %></p>
+      <% else %>
+        <p>No plans yet.</p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Real-Time Tracking Feed -->
+  <div class="bg-white p-4 rounded shadow">
+    <h2 class="text-xl font-bold mb-2">🟢 Live Tracking Feed</h2>
+    <div id="tracking_feed">
+      <%= turbo_frame_tag "tracking_feed" do %>
+        <%= render partial: "exercise_trackings/tracking", collection: current_user.exercise_trackings.order(created_at: :desc).limit(10), as: :tracking %>
+      <% end %>
+    </div>
+  </div>
+</div>

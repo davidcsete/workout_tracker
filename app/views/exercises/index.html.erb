@@ -1,0 +1,9 @@
+<h1 class="text-2xl font-bold mb-4"><%= @workout_plan.name %> - Exercises</h1>
+
+<ul class="space-y-3">
+  <% @exercises.each do |exercise| %>
+    <turbo-frame id="exercise_<%= exercise.id %>">
+      <%= render partial: "exercise", locals: { exercise: exercise, workout_plan: @workout_plan } %>
+    </turbo-frame>
+  <% end %>
+</ul>

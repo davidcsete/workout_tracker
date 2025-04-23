@@ -1,0 +1,7 @@
+<div id="<%= dom_id(tracking) %>" class="border-b py-2">
+  <p>
+    <strong><%= tracking.exercise.name %></strong>
+    – <%= tracking.reps %> reps @ <%= tracking.weight %>kg
+    (<%= time_ago_in_words(tracking.created_at) %> ago)
+  </p>
+</div>

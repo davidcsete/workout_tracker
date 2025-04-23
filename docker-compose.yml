@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    command: bin/rails server -b 0.0.0.0
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - ollama
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: dcsete
+      POSTGRES_PASSWORD: Aa123456
+      POSTGRES_DB: workout_tracker_development
+    ports:
+      - "5432:5432"
+  ollama:
+    build:
+      context: .
+      dockerfile: docker/ollama/Dockerfile
+    ports:
+      - "11434:11434"

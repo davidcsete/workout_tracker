@@ -1,0 +1,12 @@
+<% content_for :title, "New exercise tracking" %>
+
+<div class="md:w-2/3 w-full">
+  <h1 class="font-bold text-4xl">New exercise tracking</h1>
+
+  <%= render "form", exercise_tracking: @exercise_tracking %>
+
+  <%= link_to "Back to exercise trackings", exercise_trackings_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
+</div>
+<%= turbo_frame_tag "tracking_feed" do %>
+  <%= render partial: "exercise_trackings/feed", locals: { exercise_trackings: @exercise.exercise_trackings.today_for_user(current_user) } %>
+<% end %>
