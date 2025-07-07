@@ -10,15 +10,15 @@
       </ul>
     </div>
   <% end %>
-
+  <% if @workout_plan %>
+    <%= form.hidden_field :workout_plan_id, value: @workout_plan.id %>
+  <% else %>
+    
+  <% end %>
   <div class="my-5">
-    <%= form.label :user_id %>
-    <%= form.text_field :user_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": exercise_tracking.errors[:user_id].none?, "border-red-400 focus:outline-red-600": exercise_tracking.errors[:user_id].any?}] %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :exercise_id %>
-    <%= form.text_field :exercise_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": exercise_tracking.errors[:exercise_id].none?, "border-red-400 focus:outline-red-600": exercise_tracking.errors[:exercise_id].any?}] %>
+    <%= form.hidden_field :exercise_id, value: @exercise.id %>
+    <h3 class="pb-2"><%= @exercise.name %></h3>
+    <hr>
   </div>
 
   <div class="my-5">
@@ -31,12 +31,7 @@
     <%= form.text_field :weight, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": exercise_tracking.errors[:weight].none?, "border-red-400 focus:outline-red-600": exercise_tracking.errors[:weight].any?}] %>
   </div>
 
-  <div class="my-5">
-    <%= form.label :performed_at %>
-    <%= form.datetime_field :performed_at, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": exercise_tracking.errors[:performed_at].none?, "border-red-400 focus:outline-red-600": exercise_tracking.errors[:performed_at].any?}] %>
-  </div>
-
   <div class="inline">
-    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 btn btn-primary text-white inline-block font-medium cursor-pointer" %>
   </div>
 <% end %>
