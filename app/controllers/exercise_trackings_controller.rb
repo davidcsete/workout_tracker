@@ -5,7 +5,10 @@ class ExerciseTrackingsController < ApplicationController
 
   # GET /exercise_trackings or /exercise_trackings.json
   def index
-    @exercise_trackings = ExerciseTracking.all
+    @exercise_trackings = ExerciseTracking.all.order(created_at: :desc)
+
+    @exercise = Exercise.find(params[:exercise_id])
+    @workout_plan = WorkoutPlan.find(params[:workout_plan_id])
   end
 
   # GET /exercise_trackings/1 or /exercise_trackings/1.json
@@ -30,14 +33,15 @@ class ExerciseTrackingsController < ApplicationController
 
   # POST /exercise_trackings or /exercise_trackings.json
   def create
-    @workout_plan = WorkoutPlan.find(params[:workout_plan_id])
-    @exercise = Exercise.find(params[:exercise_id])
+    @workout_plan = WorkoutPlan.find(params[:exercise_tracking][:workout_plan_id])
+    @exercise = Exercise.find(params[:exercise_tracking][:exercise_id])
     @exercise_tracking = ExerciseTracking.new(exercise_tracking_params)
     @exercise_tracking.exercise = @exercise
     @exercise_tracking.user = current_user
-  
+
     if @exercise_tracking.save
       # Load today's trackings
+      
       @exercise_trackings = ExerciseTracking
                               .where(exercise: @exercise, user: current_user)
                               .where("created_at >= ?", Time.zone.now.beginning_of_day)

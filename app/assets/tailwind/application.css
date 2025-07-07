@@ -1,2 +1,4 @@
 @import "tailwindcss";
+/* @import "../stylesheets/pagy.css"; */
+
 @plugin "daisyui";

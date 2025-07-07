@@ -1,5 +1,7 @@
-<h1 class="text-2xl font-bold mb-4"><%= @workout_plan.name %> - Exercises</h1>
-
+<div class="flex flex-col mr-3">
+  <h1 class="text-2xl font-bold mb-4"><%= @workout_plan.name %> - Exercises</h1>
+  <%= link_to "Back to Workout plans", root_path, class: "rounded-md px-3.5 py-2.5 btn btn-info text-white block font-medium" %>
+</div>
 <ul class="space-y-3">
   <% @exercises.each do |exercise| %>
     <turbo-frame id="exercise_<%= exercise.id %>">

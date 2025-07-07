@@ -3,12 +3,12 @@
   <strong><%= exercise.name %></strong><br>
   <%= exercise.description %><br>
 
-  <% latest_tracking = exercise.exercise_trackings.order(performed_at: :desc).first %>
+  <% latest_tracking = exercise.exercise_trackings.order(created_at: :desc).first %>
   <% if latest_tracking %>
     <p class="text-sm text-gray-600">
-      Last tracked: <%= latest_tracking.reps %> reps @ <%= latest_tracking.weight %>kg on <%= latest_tracking.performed_at&.strftime("%Y-%m-%d %H:%M") %>
+      Last tracked: <%= latest_tracking.reps %> reps with <%= latest_tracking.weight %>kg @ <%= latest_tracking.performed_at&.strftime("%Y-%m-%d %H:%M") %>
     </p>
   <% end %>
 
-  <%= link_to "Track this exercise", new_workout_plan_exercise_exercise_tracking_path(workout_plan, exercise), data: { turbo_frame: "_top" }, class: "text-blue-600 hover:underline" %>
+  <%= link_to "Track this exercise", new_workout_plan_exercise_exercise_tracking_path(workout_plan, exercise), data: { turbo_frame: "_top" }, class: "btn btn-primary" %>
 </li>

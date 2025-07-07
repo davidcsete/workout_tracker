@@ -1,15 +1,22 @@
-<div id="<%= dom_id(workout_plan) %>" class="w-full sm:w-auto my-5 space-y-5">
-  <div>
-    <strong class="block font-medium mb-1">Name:</strong>
-    <%= workout_plan.name %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">User:</strong>
-    <%= workout_plan.user.username %>
-  </div>
-  <%= link_to "View Exercises", workout_plan_exercises_path(workout_plan), data: { turbo_frame: "_top" }, class: "mt-2 inline-block bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded" %>
-  <div>
-    <%= link_to "Edit", edit_workout_plan_path(workout_plan), class: "btn btn-secondary" %>
-    <%= link_to "Delete", workout_plan_path(workout_plan), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger" %>
+<br>
+<div id="<%= dom_id(workout_plan) %>" class="card  bg-base-100 card-md shadow-xl rounded-lg">
+  <div class="card-body">
+    <h2 class="card-title">Plan name:</h2>
+    <p><%= workout_plan.name %></p>
+    <div class="items-center justify-between w-full card-actions">
+      <div>
+      <%= link_to workout_plan_exercises_path(workout_plan), data: { turbo_frame: "_top" }, class: "btn btn-primary" do %>
+        View Exercises  
+        <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+        </svg>
+      <% end %>
+      </div>
+      <div class="flex gap-2">
+      <%= link_to "Edit", edit_workout_plan_path(workout_plan), class: "btn btn-accent" %>
+      <%= link_to "Delete", workout_plan_path(workout_plan), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-secondary" %>
+      </div>
+    </div> 
   </div>
 </div>
+<br>
