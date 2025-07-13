@@ -1,17 +1,26 @@
-<div class="max-w-xl mx-auto flex flex-col items-center justify-center text-center">
-<% content_for :title, "New exercise tracking" %>
+<% content_for :title, "New Exercise Tracking" %>
 
-  <div class="md:w-2/3 w-full">
-    <h1 class="font-bold text-4xl">New exercise tracking</h1>
-
-    <%= render "form", exercise_tracking: @exercise_tracking, exercise: @exercise %>
-    <%= link_to "Back to exercises", workout_plan_exercises_path(@workout_plan), class: "w-full sm:w-auto text-center mt-4 sm:mt-4 sm:ml-0 rounded-md px-3.5 py-2.5 btn btn-accent inline-block font-medium" %>
-    <br>
-    <%= link_to "To exercise trackings", exercise_trackings_path(workout_plan_id:@workout_plan.id, exercise_id: @exercise.id), class: "w-full sm:w-auto text-center mb-4 mt-4 sm:mt-4 sm:ml-0 rounded-md px-3.5 py-2.5 btn btn-info inline-block font-medium" %>
+<div class="max-w-3xl w-full mx-auto mt-24 px-4 sm:px-6 lg:px-8 space-y-8">
+  <div class="text-center">
+    <h1 class="font-bold text-3xl sm:text-4xl">New Exercise Tracking</h1>
   </div>
+
+  <%= render "form", exercise_tracking: @exercise_tracking, exercise: @exercise %>
+
+  <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 items-center justify-center">
+    <%= link_to "Back to exercises", workout_plan_exercises_path(@workout_plan),
+      class: "btn btn-accent w-full sm:w-auto text-center font-medium" %>
+
+    <%= link_to "To exercise trackings",
+      exercise_trackings_path(workout_plan_id: @workout_plan.id, exercise_id: @exercise.id),
+      class: "btn btn-info w-full sm:w-auto text-center font-medium" %>
+  </div>
+
   <div class="w-full">
-  <%= turbo_frame_tag "tracking_feed" do %>
-    <%= render partial: "exercise_trackings/feed", locals: { exercise_trackings: @exercise.exercise_trackings.today_for_user(current_user) } %>
-  <% end %>
+    <%= turbo_frame_tag "tracking_feed" do %>
+      <%= render partial: "exercise_trackings/feed", locals: {
+        exercise_trackings: @exercise.exercise_trackings.today_for_user(current_user)
+      } %>
+    <% end %>
   </div>
 </div>
