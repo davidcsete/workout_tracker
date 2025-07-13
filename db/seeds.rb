@@ -80,5 +80,20 @@ users.each do |user|
     end
   end
 end
+Goal.create!([
+  { name: "Lose weight" },
+  { name: "Build muscle" },
+  { name: "Lose weight and build muscle" },
+  { name: "Be more active" },
+  { name: "Gain weight and build muscle" },
+  { name: "Get stronger" },
+  { name: "Get stronger and build more muscle" }
+])
+
+Lifestyle.create!([
+  { name: "Active", description: "Workout 5 times per week" },
+  { name: "Slightly active", description: "Workout 3 times per week" },
+  { name: "Sedentary", description: "No workout or works out 1-2 times a week" }
+])
 
 puts "✅ Done seeding!"

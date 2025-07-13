@@ -2,7 +2,7 @@
 <div id="<%= dom_id(workout_plan) %>" class="card  bg-base-100 card-md shadow-xl rounded-lg">
   <div class="card-body">
     <h2 class="card-title">Plan name:</h2>
-    <p><%= workout_plan.name %></p>
+    <p><strong><%= workout_plan.name %></strong><br/> by <%= workout_plan.user.username %></p>
     <div class="items-center justify-between w-full card-actions">
       <div>
       <%= link_to workout_plan_exercises_path(workout_plan), data: { turbo_frame: "_top" }, class: "btn btn-primary" do %>
@@ -13,8 +13,10 @@
       <% end %>
       </div>
       <div class="flex gap-2">
-      <%= link_to "Edit", edit_workout_plan_path(workout_plan), class: "btn btn-accent" %>
-      <%= link_to "Delete", workout_plan_path(workout_plan), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-secondary" %>
+      <% if workout_plan.user == current_user %>
+        <%= link_to "Edit", edit_workout_plan_path(workout_plan), data: { turbo_frame: "_top" }, class: "btn btn-accent" %>
+        <%= link_to "Delete", workout_plan_path(workout_plan), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-secondary" %>
+      <% end %>
       </div>
     </div> 
   </div>

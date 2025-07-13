@@ -1,13 +1,18 @@
 Rails.application.routes.draw do
+  resources :home, only: [:index]
+  resources :user_details, only: [:new, :create, :edit, :update]
   get "dashboard/index"
   resources :exercise_trackings
   resources :exercises
-  root to: 'workout_plans#index'
+  root to: 'home#index'
   devise_for :users
   resources :workout_plans do
-    resources :exercises, only: [:index] do
+    resources :exercises, only: [:index, :new, :create] do
       resources :exercise_trackings, only: [:new, :create]
     end
+  end
+  namespace :api do
+    resources :exercise_trackings, only: [:index]
   end
   get "dashboard", to: "dashboard#index"
   post "/chatbots", to: "chatbots#create"

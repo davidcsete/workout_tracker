@@ -4,8 +4,7 @@ class WorkoutPlansController < ApplicationController
 
   # GET /workout_plans or /workout_plans.json
   def index
-    # byebug
-    @workout_plans = current_user.workout_plans
+    @workout_plans = WorkoutPlan.all.order(Arel.sql("CASE WHEN user_id = #{current_user.id} THEN 0 ELSE 1 END")).uniq
   end
 
   # GET /workout_plans/1 or /workout_plans/1.json
@@ -25,10 +24,17 @@ class WorkoutPlansController < ApplicationController
   def create
     @workout_plan = current_user.workout_plans.new(workout_plan_params)
     if @workout_plan.save
-      flash[:notice] = "Workout plan created successfully"
-      redirect_to workout_plans_path
+      respond_to do |format|
+        format.html do
+          redirect_to workout_plans_path, notice: "Workout plan created successfully"
+        end
+
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.redirect_to(workout_plans_path)
+        end
+      end
     else
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 

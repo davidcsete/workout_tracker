@@ -1,0 +1,66 @@
+<div class="max-w-xl mx-auto mt-10 p-6 bg-base-200 rounded-xl shadow-md" data-controller="steps">
+  <h1 class="text-3xl font-bold mb-6 text-center">Tell us about yourself</h1>
+
+  <!-- DaisyUI Steps Indicator -->
+  <ul class="steps w-full mb-8">
+    <li class="step step-primary" data-step="1">Basic Info</li>
+    <li class="step" data-step="2">Your Goal</li>
+    <li class="step" data-step="3">Lifestyle</li>
+  </ul>
+
+  <%= form_with model: @user_detail, data: { turbo: false }, html: { id: "multi-step-form" } do |f| %>
+
+    <!-- STEP 1 -->
+    <div class="step-pane" data-step-pane="1">
+      <div class="form-control mb-4">
+        <%= f.label :age, class: "label" do %><span class="label-text">Age</span><% end %>
+        <%= f.number_field :age, class: "input input-bordered w-full" %>
+      </div>
+
+      <div class="form-control mb-4">
+        <%= f.label :height, class: "label" do %><span class="label-text">Height (cm)</span><% end %>
+        <%= f.number_field :height, step: 0.1, class: "input input-bordered w-full" %>
+      </div>
+
+      <div class="form-control mb-4">
+        <%= f.label :bodyweight, class: "label" do %><span class="label-text">Bodyweight (kg)</span><% end %>
+        <%= f.number_field :bodyweight, step: 0.1, class: "input input-bordered w-full" %>
+      </div>
+
+      <button type="button" class="btn btn-primary w-full" data-action="click->steps#next">Next</button>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-pane hidden" data-step-pane="2">
+      <div class="form-control mb-4">
+        <%= f.label :goal_id, class: "label" do %><span class="label-text">Your Fitness Goal</span><% end %>
+        <%= f.collection_select :goal_id, @goals, :id, :name, {}, class: "select select-bordered w-full" %>
+      </div>
+
+      <div class="flex justify-between gap-4 flex-col">
+        <button type="button" class="btn btn-outline w-full" data-action="click->steps#prev">Back</button>
+        <button type="button" class="btn btn-primary w-full" data-action="click->steps#next">Next</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step-pane hidden" data-step-pane="3">
+      <div class="form-control mb-4">
+        <%= f.label :lifestyle_id, class: "label" do %><span class="label-text">Your Lifestyle</span><% end %>
+        <%= f.collection_select :lifestyle_id, @lifestyles, :id, :name, {}, class: "select select-bordered w-full" %>
+      </div>
+
+      <div class="text-sm text-neutral-content mb-4">
+        <% @lifestyles.each do |l| %>
+          <p><strong><%= l.name %>:</strong> <%= l.description %></p>
+        <% end %>
+      </div>
+
+      <div class="flex justify-between gap-4 flex-col">
+        <button type="button" class="btn btn-outline w-full" data-action="click->steps#prev">Back</button>
+        <%= f.submit "Finish", class: "btn btn-success w-full" %>
+      </div>
+    </div>
+
+  <% end %>
+</div>

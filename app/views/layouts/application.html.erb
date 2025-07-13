@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
+    <%# <meta name="view-transition" content="same-origin" /> %>
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -17,18 +19,21 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
     <%= tag.link href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap", rel: "stylesheet" %>
+    <%= javascript_importmap_tags %>
     <%= javascript_include_tag "application", type: "module", defer: true %>
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
+    
   </head>
 
   <body class="">
     <div id="main-content">
-      <main class="container mx-auto mt-28 px-5 flex ">
+      <%= render "shared/navbar" %>
+      <main class="container mx-auto mt-28 px-5">
         <%= yield %>
       </main>
+      <%= render "shared/bottom_navbar" %>
     </div>
   </body>
 </html>
