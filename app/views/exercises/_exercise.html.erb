@@ -1,14 +1,19 @@
-<br>
-<li class="border p-3 rounded-xl shadow">
-  <strong><%= exercise.name %></strong><br>
-  <%= exercise.description %><br>
+<li class="border border-gray-700 p-4 rounded-xl shadow bg-gray-800 text-white mb-2">
+  <h2 class="text-lg font-semibold"><%= exercise.name %></h2>
+
+  <p class="truncate text-sm text-gray-400 mt-1 mb-3">
+    <%= exercise.description %>
+  </p>
 
   <% latest_tracking = exercise.exercise_trackings.order(created_at: :desc).first %>
   <% if latest_tracking %>
-    <p class="text-sm text-gray-600">
-      Last tracked: <%= latest_tracking.reps %> reps with <%= latest_tracking.weight %>kg @ <%= latest_tracking.performed_at&.strftime("%Y-%m-%d %H:%M") %>
+    <p class="text-sm text-gray-400 mb-3">
+      Last tracked: <%= latest_tracking.reps %> reps with <%= latest_tracking.weight %>kg
+      @ <%= latest_tracking.performed_at&.strftime("%Y-%m-%d %H:%M") %>
     </p>
   <% end %>
 
-  <%= link_to "Track this exercise", new_workout_plan_exercise_exercise_tracking_path(workout_plan, exercise), data: { turbo_frame: "_top" }, class: "btn btn-primary" %>
+  <% unless params[:action] == "edit" %>
+    <%= link_to "Track this exercise", new_workout_plan_exercise_exercise_tracking_path(workout_plan, exercise), data: { turbo_frame: "_top" }, class: "btn btn-primary w-full sm:w-auto" %>
+  <% end %>
 </li>

@@ -2,5 +2,12 @@
 import "@hotwired/turbo-rails"
 import "controllers"
 import "page_transitions"
+import "@rails/ujs"
+// Rails.start() // <-- This initializes UJS to handle method: :delete etc.
+import { application } from "controllers/application"
+import StepsController from "controllers/steps_controller"
+import WorkoutChartController from "controllers/chart_controller"
+application.register("chart", WorkoutChartController)
+application.register("steps", StepsController)
 
 Turbo.session.drive = true

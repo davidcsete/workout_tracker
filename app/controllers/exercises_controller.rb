@@ -1,9 +1,9 @@
 class ExercisesController < ApplicationController
   before_action :set_exercise, only: %i[ show edit update destroy ]
+  before_action :set_workout_plan, only: %i[ new create index ]
 
   # GET /exercises or /exercises.json
   def index
-    @workout_plan = WorkoutPlan.find(params[:workout_plan_id])
     @exercises = @workout_plan.exercises
   end
 
@@ -26,7 +26,8 @@ class ExercisesController < ApplicationController
 
     respond_to do |format|
       if @exercise.save
-        format.html { redirect_to @exercise, notice: "Exercise was successfully created." }
+        WorkoutPlanExercise.create!(workout_plan: @workout_plan, exercise: @exercise)
+        format.html { redirect_to edit_workout_plan_path(@workout_plan), notice: "Exercise created successfully." }
         format.json { render :show, status: :created, location: @exercise }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -68,4 +69,8 @@ class ExercisesController < ApplicationController
     def exercise_params
       params.expect(exercise: [ :name, :description ])
     end
+    
+    def set_workout_plan
+      @workout_plan = WorkoutPlan.find(params[:workout_plan_id])
+    end 
 end

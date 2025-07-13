@@ -1,0 +1,31 @@
+<div class="btm-nav fixed bottom-0 w-full z-50 bg-base-100 shadow-md flex flex-row items-stretch justify-between">
+  <!-- Workout Plans (Left) -->
+  <%= link_to workout_plans_path, class: "text-secondary flex flex-col items-center ml-15" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+         viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 17v-6h13v6M9 5h13v6H9zM4 12h.01M4 6h.01M4 18h.01" />
+    </svg>
+    <span class="text-xs">Plans</span>
+  <% end %>
+
+  <!-- Home (Center) -->
+  <%= link_to root_path, class: "text-primary flex flex-col items-center" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+         viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 10l9-7 9 7v10a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+    </svg>
+    <span class="text-xs">Home</span>
+  <% end %>
+
+  <!-- Diet (Right) -->
+  <%= link_to "diet_path", class: "text-accent flex flex-col items-center mr-15" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+         viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 6V4m0 16v-2m8-8h2M4 12H2m15.364 6.364l1.414 1.414M6.222 6.222l1.414 1.414M17.778 6.222l1.414-1.414M6.222 17.778l-1.414 1.414M12 8a4 4 0 100 8 4 4 0 000-8z" />
+    </svg>
+    <span class="text-xs">Diet</span>
+  <% end %>
+</div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_23_143123) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_11_104816) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,33 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_23_143123) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "goals", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "lifestyles", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "user_details", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.integer "age"
+    t.float "height"
+    t.float "bodyweight"
+    t.bigint "goal_id", null: false
+    t.bigint "lifestyle_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["goal_id"], name: "index_user_details_on_goal_id"
+    t.index ["lifestyle_id"], name: "index_user_details_on_lifestyle_id"
+    t.index ["user_id"], name: "index_user_details_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -83,6 +110,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_23_143123) do
   add_foreign_key "exercise_trackings", "users"
   add_foreign_key "exercise_weekdays", "exercises"
   add_foreign_key "exercise_weekdays", "weekdays"
+  add_foreign_key "user_details", "goals"
+  add_foreign_key "user_details", "lifestyles"
+  add_foreign_key "user_details", "users"
   add_foreign_key "workout_plan_exercises", "exercises"
   add_foreign_key "workout_plan_exercises", "workout_plans"
   add_foreign_key "workout_plans", "users"
