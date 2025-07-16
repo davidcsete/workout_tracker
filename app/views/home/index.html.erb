@@ -2,3 +2,46 @@
   <h1 class="text-2xl font-bold mb-4">Weekly Workout Overview</h1>
   <canvas id="myChart" data-controller="chart" class="w-full h-64 rounded shadow-md bg-white"></canvas>
 </div>
+<h2 class="text-xl text-center font-semibold my-4">Today's Calories: <%= @total_calories %></h2>
+
+<canvas id="macroChart" width="300" height="300" class="mx-auto my-15"></canvas>
+
+<script>
+  document.addEventListener("turbo:load", () => {
+    const protein = <%= @macros[:protein] || 0 %>;
+    const carbs = <%= @macros[:carbs] || 0 %>;
+    const fats = <%= @macros[:fats] || 0 %>;
+
+    const ctx = document.getElementById("macroChart")?.getContext("2d");
+
+    if (!ctx) return;
+
+    // Destroy old chart if it exists
+    if (window.macroChartInstance) {
+      window.macroChartInstance.destroy();
+    }
+
+    // Create new chart
+    window.macroChartInstance = new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: ["Protein", "Carbs", "Fats"],
+        datasets: [{
+          label: "Macros (g)",
+          data: [protein, carbs, fats],
+          backgroundColor: ["#60a5fa", "#facc15", "#f87171"],
+          borderColor: ["#3b82f6", "#eab308", "#ef4444"],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: false,
+        plugins: {
+          legend: {
+            position: "bottom"
+          }
+        }
+      }
+    });
+  });
+</script>
