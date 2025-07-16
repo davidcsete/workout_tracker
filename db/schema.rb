@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_11_104816) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_15_121507) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -42,6 +42,31 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_11_104816) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "food_items", force: :cascade do |t|
+    t.string "name"
+    t.integer "calories"
+    t.float "protein"
+    t.float "carbs"
+    t.float "fats"
+    t.bigint "meal_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "grams"
+    t.bigint "food_id"
+    t.index ["food_id"], name: "index_food_items_on_food_id"
+    t.index ["meal_id"], name: "index_food_items_on_meal_id"
+  end
+
+  create_table "foods", force: :cascade do |t|
+    t.string "name"
+    t.float "calories"
+    t.float "protein"
+    t.float "carbs"
+    t.float "fats"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "goals", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -53,6 +78,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_11_104816) do
     t.string "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "meals", force: :cascade do |t|
+    t.string "name"
+    t.integer "meal_type"
+    t.datetime "consumed_at"
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_meals_on_user_id"
   end
 
   create_table "user_details", force: :cascade do |t|
@@ -110,6 +145,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_11_104816) do
   add_foreign_key "exercise_trackings", "users"
   add_foreign_key "exercise_weekdays", "exercises"
   add_foreign_key "exercise_weekdays", "weekdays"
+  add_foreign_key "food_items", "foods"
+  add_foreign_key "food_items", "meals"
+  add_foreign_key "meals", "users"
   add_foreign_key "user_details", "goals"
   add_foreign_key "user_details", "lifestyles"
   add_foreign_key "user_details", "users"

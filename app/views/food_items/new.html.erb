@@ -1,0 +1,74 @@
+<!-- app/views/food_items/new.html.erb -->
+<div class="max-w-lg mx-auto p-4"
+        data-controller="food-search" 
+        data-food-search-url-value="/foods/search"
+        data-food-search-min-length-value="2"
+        data-food-search-debounce-value="300"
+        data-action="click@window->food-search#clickOutside">
+  <h1 class="text-2xl font-bold mb-4">Add Food to <%= @meal.meal_type.titleize %></h1>
+
+  <%= form_with(model: [@meal, @food_item], local: true, class: "space-y-4") do |form| %>
+    <div class="relative">
+      <%= form.label :name, "Search Foods", class: "block font-medium" %>
+      <%= form.text_field :name, 
+          class: "w-full rounded-md border px-3 py-2",
+          placeholder: "Type to search for foods...",
+          data: { 
+            "food-search-target": "input", 
+            action: "input->food-search#search focus->food-search#search" 
+          } %>
+
+      <ul data-food-search-target="results" 
+          class="bg-white shadow-lg mt-1 rounded-md z-10 absolute w-full max-h-48 overflow-y-auto hidden border">
+        <!-- Search results will be populated here -->
+      </ul>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= form.label :grams %>
+        <%= form.number_field :grams, 
+            step: 1, 
+            class: "w-full rounded-md border px-3 py-2",
+            data: { 
+              "food-search-target": "grams",
+              action: "input->food-search#updateNutrition"
+            } %>
+      </div>
+
+      <div>
+        <%= form.label :calories %>
+        <%= form.number_field :calories, 
+            step: 1, 
+            class: "w-full rounded-md border px-3 py-2",
+            data: { "food-search-target": "calories" } %>
+      </div>
+
+      <div>
+        <%= form.label :protein %>
+        <%= form.number_field :protein, 
+            step: 0.1, 
+            class: "w-full rounded-md border px-3 py-2",
+            data: { "food-search-target": "protein" } %>
+      </div>
+
+      <div>
+        <%= form.label :carbs %>
+        <%= form.number_field :carbs, 
+            step: 0.1, 
+            class: "w-full rounded-md border px-3 py-2",
+            data: { "food-search-target": "carbs" } %>
+      </div>
+
+      <div>
+        <%= form.label :fats %>
+        <%= form.number_field :fats, 
+            step: 0.1, 
+            class: "w-full rounded-md border px-3 py-2",
+            data: { "food-search-target": "fats" } %>
+      </div>
+    </div>
+
+    <%= form.submit "Add Food Item", class: "btn btn-accent" %>
+  <% end %>
+</div>

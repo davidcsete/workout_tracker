@@ -1,0 +1,27 @@
+<% flash.each do |type, message| %>
+  <% alert_class =
+    case type.to_sym
+    when :notice then "alert-success"
+    when :alert  then "alert-error"
+    when :info   then "alert-info"
+    when :warning then "alert-warning"
+    else "alert-info"
+    end
+  %>
+
+  <div data-controller="flash"
+       class="alert <%= alert_class %> shadow-lg mb-4 transition-opacity duration-500">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+         viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
+    </svg>
+
+    <span><%= message %></span>
+
+    <button data-action="click->flash#close" class="ml-auto btn btn-sm btn-ghost h-6 w-6 p-1">
+      ✕
+    </button>
+  </div>
+<% end %>

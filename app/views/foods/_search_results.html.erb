@@ -1,0 +1,32 @@
+<!-- app/views/foods/_search_results.html.erb -->
+<% if @foods.any? %>
+  <% @foods.each do |food| %>
+    <li class="px-3 py-2 cursor-pointer hover:bg-gray-100 border-b border-gray-200 last:border-b-0"
+        data-action="click->food-search#selectFood"
+        data-food-id="<%= food.id %>"
+        data-food-name="<%= food.name %>"
+        data-food-calories="<%= food.calories || 0 %>"
+        data-food-protein="<%= food.protein || 0 %>"
+        data-food-carbs="<%= food.carbs || 0 %>"
+        data-food-fats="<%= food.fats || 0 %>">
+      <div class="flex justify-between items-center">
+        <div>
+          <span class="font-medium"><%= food.name %></span>
+          <% if food.respond_to?(:brand) && food.brand.present? %>
+            <span class="text-sm text-gray-500">(<%= food.brand %>)</span>
+          <% end %>
+        </div>
+        <div class="text-sm text-gray-500">
+          <%= food.calories || 0 %>cal
+        </div>
+      </div>
+      <div class="text-xs text-gray-400 mt-1">
+        P: <%= food.protein || 0 %>g | C: <%= food.carbs || 0 %>g | F: <%= food.fats || 0 %>g
+      </div>
+    </li>
+  <% end %>
+<% else %>
+  <li class="px-3 py-2 text-gray-500 text-sm">
+    No foods found matching your search
+  </li>
+<% end %>

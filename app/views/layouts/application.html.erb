@@ -28,12 +28,13 @@
   </head>
 
   <body class="">
-    <div id="main-content">
       <%= render "shared/navbar" %>
-      <main class="container mx-auto mt-28 px-5">
+      <main id="main-content" class="container mx-auto mt-28 px-5">
+        <div id="flash-container">
+          <%= render "layouts/flash" %>
+        </div>
         <%= yield %>
       </main>
       <%= render "shared/bottom_navbar" %>
-    </div>
   </body>
 </html>
