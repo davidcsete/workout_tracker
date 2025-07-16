@@ -1,0 +1,61 @@
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-6 text-base-content">Your Meals for Today</h1>
+
+  <%= link_to "Add a Meal", new_meal_path, class: "btn btn-primary mb-6 inline-block" %>
+
+  <% total_macros = current_user.meals.joins(:food_items).select(
+    "SUM(food_items.calories) AS total_calories",
+    "SUM(food_items.protein) AS total_protein",
+    "SUM(food_items.carbs) AS total_carbs",
+    "SUM(food_items.fats) AS total_fats"
+  ).where(created_at: Time.zone.today.all_day).take %>
+
+  <% if total_macros && total_macros.total_calories %>
+    <div class="bg-base-200 text-base-content rounded-lg p-4 mb-6 shadow">
+      <h2 class="text-lg font-semibold mb-2">Today's Total Nutrition</h2>
+      <ul class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        <li><strong>Calories:</strong> <%= total_macros&.total_calories.to_i %> kcal</li>
+        <li><strong>Protein:</strong> <%= total_macros&.total_protein.to_f.round(1) %> g</li>
+        <li><strong>Carbs:</strong> <%= total_macros&.total_carbs.to_f.round(1) %> g</li>
+        <li><strong>Fat:</strong> <%= total_macros&.total_fats.to_f.round(1) %> g</li>
+      </ul>
+    </div>
+  <% end %>
+
+  <% @meals.each do |meal| %>
+    <div class="bg-base-100 text-base-content shadow-md border border-base-300 rounded-xl p-4 mb-6">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xl font-semibold"><%= meal.meal_type.titleize %></h2>
+        <%= link_to "Add Food", new_meal_food_item_path(meal), class: "btn btn-sm btn-accent" %>
+      </div>
+
+      <ul class="mt-4 divide-y divide-base-300">
+        <% if meal.food_items.empty? %>
+          <li class="text-sm text-neutral-content">No food items added yet.</li>
+        <% else %>
+          <% meal.food_items.each do |item| %>
+            <li class="flex justify-between py-2">
+              <div>
+                <strong><%= item.name %></strong> – <%= item.grams %>g
+              </div>
+              <div class="text-sm">
+                <%= item.calories %> kcal |
+                <%= item.protein %>g P |
+                <%= item.carbs %>g C |
+                <%= item.fats %>g F
+              </div>
+            </li>
+          <% end %>
+        <% end %>
+      </ul>
+
+      <div class="mt-4 font-medium text-right">
+        <% total_cals = meal.food_items.sum { |item| item.calories.to_f } %>
+        <% total_protein = meal.food_items.sum { |item| item.protein.to_f } %>
+        <% total_carbs = meal.food_items.sum { |item| item.carbs.to_f } %>
+        <% total_fat = meal.food_items.sum { |item| item.fats.to_f } %>
+        <span>Total: <%= total_cals %> kcal — <%= total_protein %>g P, <%= total_carbs %>g C, <%= total_fat %>g F</span>
+      </div>
+    </div>
+  <% end %>
+</div>

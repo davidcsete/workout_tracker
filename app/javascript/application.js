@@ -7,7 +7,11 @@ import "@rails/ujs"
 import { application } from "controllers/application"
 import StepsController from "controllers/steps_controller"
 import WorkoutChartController from "controllers/chart_controller"
+import FoodSearchController from "controllers/food_search_controller"
+// import FlashController from "./controllers/flash_controller"
 application.register("chart", WorkoutChartController)
 application.register("steps", StepsController)
+application.register("autocomplete", FoodSearchController)
+// application.register("flash", FlashController)
 
 Turbo.session.drive = true
