@@ -2,7 +2,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["input", "results", "grams", "calories", "protein", "carbs", "fats"]
+  static targets = ["input", "results", "grams", "foodId" ,"calories", "protein", "carbs", "fats"]
   static values = { 
     url: String,
     minLength: { type: Number, default: 2 },
@@ -13,6 +13,7 @@ export default class extends Controller {
     console.log("Food search controller connected")
     this.timeout = null
     this.abortController = null
+    this.selectedFoodName = null // track last selected food
   }
 
   disconnect() {
@@ -65,7 +66,7 @@ export default class extends Controller {
   selectFood(event) {
     console.log("selectFood called")
     const foodData = {
-      id: event.currentTarget.dataset.foodId,
+      foodId: event.currentTarget.dataset.foodId,
       name: event.currentTarget.dataset.foodName,
       calories: event.currentTarget.dataset.foodCalories,
       protein: event.currentTarget.dataset.foodProtein,
@@ -75,6 +76,7 @@ export default class extends Controller {
     
     console.log("Food data:", foodData)
     console.log("Available targets:", {
+      hasFoodId: this.hasFoodIdTarget,
       hasGrams: this.hasGramsTarget,
       hasCalories: this.hasCaloriesTarget,
       hasProtein: this.hasProteinTarget,
@@ -100,7 +102,13 @@ export default class extends Controller {
     } else {
       console.log("Calories target not found")
     }
-    
+    if (this.hasFoodIdTarget) {
+      console.log("Setting foodId to", foodData.foodId)
+      this.foodIdTarget.value = foodData.foodId || 0
+    } else {
+      console.log("foodId target not found")
+    }
+
     if (this.hasProteinTarget) {
       console.log("Setting protein to", foodData.protein)
       this.proteinTarget.value = foodData.protein || 0
@@ -130,6 +138,40 @@ export default class extends Controller {
     
     // Hide results
     this.hideResults()
+    this.selectedFoodName = foodData.name
+  }
+
+  handleInputChange() {
+    const currentValue = this.inputTarget.value.trim()
+  
+    // If user manually edits and it's different from selected, clear the ID
+    if (this.selectedFoodName && currentValue !== this.selectedFoodName) {
+      if (this.hasFoodIdTarget) {
+        this.foodIdTarget.value = ""
+      }
+  
+      // Optionally clear macro values if desired:
+      if (this.hasGramsTarget) this.gramsTarget.value = ""
+      if (this.hasCaloriesTarget) this.caloriesTarget.value = ""
+      if (this.hasProteinTarget) this.proteinTarget.value = ""
+      if (this.hasCarbsTarget) this.carbsTarget.value = ""
+      if (this.hasFatsTarget) this.fatsTarget.value = ""
+    }
+  }
+
+  blur() {
+    const query = this.inputTarget.value.trim().toLowerCase()
+    if (!query) return
+  
+    // Find exact match from result list
+    const matched = Array.from(this.resultsTarget.children).find(item =>
+      item.dataset.foodName?.toLowerCase() === query
+    )
+  
+    if (matched) {
+      // Simulate selecting the food if matched
+      matched.click()
+    }
   }
 
   // Update nutritional values when grams change

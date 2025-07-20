@@ -1,18 +1,40 @@
-<div id="<%= dom_id meal %>" class="w-full sm:w-auto my-5 space-y-5">
-  <div>
-    <strong class="block font-medium mb-1">Name:</strong>
-    <%= meal.name %>
+<div class="bg-base-100 text-base-content shadow-md border border-base-300 rounded-xl p-4 mb-6">
+    <div class="flex justify-between items-center">
+      <h2 class="text-xl font-semibold"><%= meal.meal_type.titleize %></h2>
+      <%= link_to "Add Food", new_meal_food_item_path(meal, date: @date), 
+          class: "btn btn-sm btn-accent", 
+          data: { turbo_frame: "_top" } %>
+    </div>
+
+    <ul class="mt-4 divide-y divide-base-300">
+      <% if meal.food_items.empty? %>
+        <li class="text-sm text-neutral-content">No food items added yet.</li>
+      <% else %>
+        <% meal.food_items.each do |item| %>
+          <li id="<%= dom_id(item) %>" class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 py-2 transition-all duration-300 ease-in-out">
+            <div class="flex-1">
+              <strong><%= item.name %></strong> – <%= item.grams %>g
+              <div class="text-sm">
+                <%= item.calories %> kcal |
+                <%= item.protein %>g P |
+                <%= item.carbs %>g C |
+                <%= item.fats %>g F
+              </div>
+            </div>
+            <%= button_to meal_food_item_path(meal, item), method: :delete, data: { turbo_confirm: "Are you sure?" },
+                  class: "btn btn-sm btn-outline btn-error" do %>
+              Delete
+            <% end %>
+          </li>
+        <% end %>
+      <% end %>
+    </ul>
+
+    <div id="<%= dom_id(meal, :totals) %>" class="mt-4 font-medium text-right">
+      <% total_cals = meal.food_items.sum { |item| item.calories.to_f } %>
+      <% total_protein = meal.food_items.sum { |item| item.protein.to_f } %>
+      <% total_carbs = meal.food_items.sum { |item| item.carbs.to_f } %>
+      <% total_fat = meal.food_items.sum { |item| item.fats.to_f } %>
+      <span>Total: <%= total_cals %> kcal — <%= total_protein %>g P, <%= total_carbs %>g C, <%= total_fat %>g F</span>
+    </div>
   </div>
-  <div>
-    <strong class="block font-medium mb-1">Meal type:</strong>
-    <%= meal.meal_type %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">Consumed at:</strong>
-    <%= meal.consumed_at %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">User:</strong>
-    <%= meal.user_id %>
-  </div>
-</div>

@@ -18,7 +18,7 @@ gem "stimulus-rails"
 gem "tailwindcss-rails", "~> 4.0"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
-gem 'faker'
+gem "faker"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
@@ -56,6 +56,7 @@ end
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
+  gem "solargraph"
   gem "web-console"
 end
 
@@ -67,6 +68,6 @@ end
 
 gem "devise", "~> 4.9"
 
-gem "rspec-rails", "~> 7.1", :groups => [:development, :test]
+gem "rspec-rails", "~> 7.1", groups: [ :development, :test ]
 
-gem "byebug", "~> 12.0", :groups => [:development, :test]
+gem "byebug", "~> 12.0", groups: [ :development, :test ]

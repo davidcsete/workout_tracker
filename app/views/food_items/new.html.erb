@@ -15,7 +15,7 @@
           placeholder: "Type to search for foods...",
           data: { 
             "food-search-target": "input", 
-            action: "input->food-search#search focus->food-search#search" 
+            action: "input->food-search#search focus->food-search#search input->food-search#handleInputChange blur->food-search#blur" 
           } %>
 
       <ul data-food-search-target="results" 
@@ -35,7 +35,10 @@
               action: "input->food-search#updateNutrition"
             } %>
       </div>
-
+      <%= form.hidden_field :food_id,
+        data: { "food-search-target": "foodId" }
+      %>
+      <%= form.hidden_field :consumed_at, value: @date.strftime("%Y-%m-%d") %>
       <div>
         <%= form.label :calories %>
         <%= form.number_field :calories, 

@@ -34,11 +34,26 @@ document.addEventListener("turbo:before-render", (event) => {
   const newPage = event.detail.newBody;
 
   if (lastNavigationDirection === "forward") {
+    newPage.classList.remove("animate-slide-in-left");
     newPage.classList.add("animate-slide-in-right");
   } else {
+    newPage.classList.remove("animate-slide-in-right");
     newPage.classList.add("animate-slide-in-left");
   }
 
   // Optional: reset after render
   lastNavigationDirection = "forward";
+});
+
+document.addEventListener("turbo:before-stream-render", (event) => {
+  const stream = event.target;
+  if (stream.action === "remove") {
+    const element = document.getElementById(stream.target);
+    if (element) {
+      element.classList.add("opacity-0", "translate-x-4");
+      element.classList.remove("transition-none");
+      setTimeout(() => element.remove(), 300); // Match Tailwind duration
+      event.preventDefault();
+    }
+  }
 });

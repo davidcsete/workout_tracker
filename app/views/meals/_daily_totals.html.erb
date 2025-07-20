@@ -1,0 +1,20 @@
+<%= turbo_frame_tag "daily_totals" do %>
+  <% total_macros = current_user.meals.joins(:food_items).select(
+    "SUM(food_items.calories) AS total_calories",
+    "SUM(food_items.protein) AS total_protein",
+    "SUM(food_items.carbs) AS total_carbs",
+    "SUM(food_items.fats) AS total_fats"
+  ).where(consumed_at: date.all_day).take %>
+
+  <% if total_macros && total_macros.total_calories %>
+    <div class="bg-base-200 text-base-content rounded-lg p-4 mb-6 shadow animate-fade-in">
+      <h2 class="text-lg font-semibold mb-2">Today's Total Nutrition</h2>
+      <ul class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        <li><strong>Calories:</strong> <%= total_macros.total_calories.to_i %> kcal</li>
+        <li><strong>Protein:</strong> <%= total_macros.total_protein.to_f.round(1) %> g</li>
+        <li><strong>Carbs:</strong> <%= total_macros.total_carbs.to_f.round(1) %> g</li>
+        <li><strong>Fat:</strong> <%= total_macros.total_fats.to_f.round(1) %> g</li>
+      </ul>
+    </div>
+  <% end %>
+<% end %>

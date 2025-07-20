@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_15_121507) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_20_180045) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -53,6 +53,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_15_121507) do
     t.datetime "updated_at", null: false
     t.integer "grams"
     t.bigint "food_id"
+    t.date "consumed_at"
     t.index ["food_id"], name: "index_food_items_on_food_id"
     t.index ["meal_id"], name: "index_food_items_on_meal_id"
   end

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html class="">
+<html>
   <head>
     <title><%= content_for(:title) || "Workout Tracker" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <%# <meta name="view-transition" content="same-origin" /> %>
@@ -27,9 +27,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   </head>
 
-  <body class="">
+  <body class="w-full max-w-none p-0 m-0">
       <%= render "shared/navbar" %>
-      <main id="main-content" class="container mx-auto mt-28 px-5">
+      <main id="main-content" class="container mx-auto mt-0 px-5">
         <div id="flash-container">
           <%= render "layouts/flash" %>
         </div>

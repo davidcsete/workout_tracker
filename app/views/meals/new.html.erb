@@ -9,6 +9,9 @@
                       {}, class: "w-full rounded-md border px-3 py-2" %>
     </div>
 
+    <!-- Hidden field to preserve the date context -->
+    <%= form.hidden_field :date, value: params[:date] %>
+
     <%= form.submit "Create Meal", class: "btn btn-primary" %>
   <% end %>
 </div>
