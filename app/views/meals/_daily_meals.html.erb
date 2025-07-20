@@ -1,0 +1,5 @@
+<%= turbo_frame_tag "daily_meals" do %>
+  <% meals.each do |meal| %>
+    <%= render partial: "meals/meal", locals: { meal: meal } %>
+  <% end %>
+<% end %>

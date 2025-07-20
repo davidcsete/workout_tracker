@@ -2,6 +2,8 @@ class FoodItem < ApplicationRecord
   belongs_to :meal
   belongs_to :food, optional: true
 
+  validates :consumed_at, presence: true
+
   before_save :populate_nutrients_from_food, if: -> { food.present? && (calories.nil? || protein.nil? || carbs.nil? || fats.nil?) }
 
   private

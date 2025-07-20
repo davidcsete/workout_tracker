@@ -1,0 +1,38 @@
+<%= turbo_stream.remove @food_item %>
+
+<%= turbo_stream.replace @meal do %>
+  <%= render partial: "meals/meal", locals: { meal: @meal } %>
+<% end %>
+
+<%= turbo_stream.replace "daily_totals" do %>
+  <%= turbo_frame_tag "daily_totals" do %>
+    <% total_macros = current_user.meals.joins(:food_items).select(
+      "SUM(food_items.calories) AS total_calories",
+      "SUM(food_items.protein) AS total_protein",
+      "SUM(food_items.carbs) AS total_carbs",
+      "SUM(food_items.fats) AS total_fats"
+    ).where(consumed_at: Time.zone.today.all_day).take %>
+
+    <% if total_macros && total_macros.total_calories %>
+      <div class="bg-base-200 text-base-content rounded-lg p-4 mb-6 shadow">
+        <h2 class="text-lg font-semibold mb-2">Today's Total Nutrition</h2>
+        <ul class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <li><strong>Calories:</strong> <%= total_macros.total_calories.to_i %> kcal</li>
+          <li><strong>Protein:</strong> <%= total_macros.total_protein.to_f.round(1) %> g</li>
+          <li><strong>Carbs:</strong> <%= total_macros.total_carbs.to_f.round(1) %> g</li>
+          <li><strong>Fat:</strong> <%= total_macros.total_fats.to_f.round(1) %> g</li>
+        </ul>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
+
+<%= turbo_stream.replace dom_id(@meal, :totals) do %>
+  <% total_cals = @meal.food_items.sum { |item| item.calories.to_f } %>
+  <% total_protein = @meal.food_items.sum { |item| item.protein.to_f } %>
+  <% total_carbs = @meal.food_items.sum { |item| item.carbs.to_f } %>
+  <% total_fat = @meal.food_items.sum { |item| item.fats.to_f } %>
+  <div id="<%= dom_id(@meal, :totals) %>" class="mt-4 font-medium text-right">
+    <span>Total: <%= total_cals %> kcal — <%= total_protein %>g P, <%= total_carbs %>g C, <%= total_fat %>g F</span>
+  </div>
+<% end %>
