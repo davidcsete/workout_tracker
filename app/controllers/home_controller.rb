@@ -7,7 +7,7 @@ class HomeController < ApplicationController
   private
 
   def today_macros
-    meals_today = current_user.meals.where(created_at: Time.zone.today.all_day)
+    meals_today = current_user.meals.where(consumed_at: Time.zone.today.all_day)
 
     totals = meals_today.joins(:food_items).select(
       "SUM(food_items.calories) as total_calories",

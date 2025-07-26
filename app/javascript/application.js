@@ -3,6 +3,7 @@ import "@hotwired/turbo-rails"
 import "controllers"
 import "page_transitions"
 import "@rails/ujs"
+import "theme_handler"
 // Rails.start() // <-- This initializes UJS to handle method: :delete etc.
 import { application } from "controllers/application"
 import StepsController from "controllers/steps_controller"
