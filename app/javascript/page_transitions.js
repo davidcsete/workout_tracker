@@ -40,9 +40,6 @@ document.addEventListener("turbo:before-render", (event) => {
     newPage.classList.remove("animate-slide-in-right");
     newPage.classList.add("animate-slide-in-left");
   }
-
-  // Optional: reset after render
-  lastNavigationDirection = "forward";
 });
 
 document.addEventListener("turbo:before-stream-render", (event) => {

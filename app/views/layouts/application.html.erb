@@ -29,11 +29,13 @@
 
   <body class="w-full max-w-none p-0 m-0">
       <%= render "shared/navbar" %>
-      <main id="main-content" class="container mx-auto mt-0 px-5">
+      <main class="container mx-auto mt-0 px-5">
         <div id="flash-container">
           <%= render "layouts/flash" %>
         </div>
-        <%= yield %>
+        <div id ="main-content">
+          <%= yield %>
+        </div>
       </main>
       <%= render "shared/bottom_navbar" %>
   </body>
