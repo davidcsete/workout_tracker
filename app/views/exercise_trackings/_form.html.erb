@@ -17,6 +17,11 @@
     <%= form.hidden_field :workout_plan_id, value: @workout_plan.id %>
   <% end %>
 
+  <%# Hidden date field %>
+  <% if defined?(date) && date %>
+    <%= hidden_field_tag :date, date.strftime("%Y-%m-%d"), data: { exercise_date_target: "dateInput" } %>
+  <% end %>
+
   <%# Hidden exercise_id + display name %>
   <div>
     <%= form.hidden_field :exercise_id, value: @exercise.id %>

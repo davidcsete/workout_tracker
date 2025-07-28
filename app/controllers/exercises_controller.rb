@@ -4,7 +4,7 @@ class ExercisesController < ApplicationController
 
   # GET /exercises or /exercises.json
   def index
-    @exercises = @workout_plan.exercises
+    @workout_plan_exercises = @workout_plan.workout_plan_exercises
   end
 
   # GET /exercises/1 or /exercises/1.json
@@ -69,8 +69,8 @@ class ExercisesController < ApplicationController
     def exercise_params
       params.expect(exercise: [ :name, :description ])
     end
-    
+
     def set_workout_plan
       @workout_plan = WorkoutPlan.find(params[:workout_plan_id])
-    end 
+    end
 end

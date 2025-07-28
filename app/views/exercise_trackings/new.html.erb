@@ -1,11 +1,25 @@
 <% content_for :title, "New Exercise Tracking" %>
 
-<div class="w-full max-w-xl mx-auto px-4 snap-x lg:px-8 space-y-8 overflow-y-auto max-h-[90vh] pb-15">
+<div data-controller="exercise-date" 
+     data-workout-plan-id="<%= @workout_plan.id %>" 
+     data-exercise-id="<%= @exercise.id %>"
+     class="w-full max-w-xl mx-auto px-4 snap-x lg:px-8 space-y-8 max-h-[90vh] pb-15 mb-15">
+  
+  <div class="flex justify-center items-center mb-6 gap-4 text-2xl font-bold overflow-y-visible text-base-content">
+    <button data-action="click->exercise-date#prev" class="btn btn-ghost btn-sm">←</button>
+
+    <h1 class="text-center" data-exercise-date-target="dateDisplay">
+      <%= @date.strftime("%B %-d, %Y") %>
+    </h1>
+
+    <button data-action="click->exercise-date#next" class="btn btn-ghost btn-sm">→</button>
+  </div>
+  
   <div class="text-center">
-    <h1 class="font-bold text-3xl sm:text-4xl">New Exercise Tracking</h1>
+    <h2 class="font-bold text-xl sm:text-2xl"><%= @exercise.name %></h2>
   </div>
 
-  <%= render "form", exercise_tracking: @exercise_tracking, exercise: @exercise %>
+  <%= render "form", exercise_tracking: @exercise_tracking, exercise: @exercise, date: @date %>
 
   <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 items-center justify-center">
     <%= link_to "Back to exercises", workout_plan_exercises_path(@workout_plan),
@@ -19,7 +33,7 @@
   <div class="w-full">
     <%= turbo_frame_tag "tracking_feed" do %>
       <%= render partial: "exercise_trackings/feed", locals: {
-        exercise_trackings: @exercise.exercise_trackings.today_for_user(current_user)
+        exercise_trackings: @exercise_trackings
       } %>
     <% end %>
   </div>

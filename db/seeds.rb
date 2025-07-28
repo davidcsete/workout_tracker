@@ -15,7 +15,7 @@ Food.destroy_all
 admin = User.create!(email: "admin@example.com", password: "password", username: "Admin", admin: true)
 
 # Regular users
-users = 5.times.map do |i|
+users = 10.times.map do |i|
   User.create!(
     email: "user#{i}@example.com",
     password: "password",
@@ -24,9 +24,7 @@ users = 5.times.map do |i|
 end
 
 # Weekdays
-weekdays = %w[Monday Tuesday Wednesday Thursday Friday Saturday Sunday].map do |name|
-  Weekday.create!(name: name)
-end
+weekdays = %w[Sunday Monday Tuesday Wednesday Thursday Friday Saturday]
 
 # Realistic Exercises with links
 exercise_data = [
@@ -39,7 +37,12 @@ exercise_data = [
   [ "Overhead Press", "https://exrx.net/WeightExercises/DeltoidAnterior/BBMilitaryPress" ],
   [ "Lunges", "https://exrx.net/WeightExercises/Quadriceps/BBLunge" ],
   [ "Plank", "https://exrx.net/WeightExercises/RectusAbdominis/BWPlank" ],
-  [ "Row", "https://exrx.net/WeightExercises/BackGeneral/BBBentOverRow" ]
+  [ "Row", "https://exrx.net/WeightExercises/BackGeneral/BBBentOverRow" ],
+  [ "Leg Press", "https://exrx.net/WeightExercises/Quadriceps/LVLegPress" ],
+  [ "Cable Crossover", "https://exrx.net/WeightExercises/PectoralSternal/CBCrossover" ],
+  [ "Lat Pulldown", "https://exrx.net/WeightExercises/LatissimusDorsi/CBLatPulldown" ],
+  [ "Tricep Extension", "https://exrx.net/WeightExercises/Triceps/DBTriExt" ],
+  [ "Crunches", "https://exrx.net/WeightExercises/RectusAbdominis/BWCrunch" ]
 ]
 
 exercises = exercise_data.map do |name, description|
@@ -62,29 +65,34 @@ custom_plan_names = [
 
 # Workout plans and associations
 users.each do |user|
-  2.times do
-    plan_name = custom_plan_names.sample
-    plan = WorkoutPlan.create!(name: plan_name, user: user)
+  plan_name = custom_plan_names.sample
+  plan = WorkoutPlan.create!(name: plan_name, user: user)
 
-    exercises.sample(5).each do |exercise|
-      plan.exercises << exercise
-      exercise.weekdays << weekdays.sample(2)
-    end
+  15.times do |index|
+    exercise = exercises.sample
+    weekday = weekdays.sample
+    WorkoutPlanExercise.create!(
+      workout_plan: plan,
+      exercise: exercise,
+      day_of_the_week: weekdays.index(weekday),
+      order: index + 1
+    )
+  end
 
-    # Add tracking data
-    plan.exercises.each do |exercise|
-      3.times do
-        ExerciseTracking.create!(
-          exercise: exercise,
-          user: user,
-          reps: rand(6..15),
-          weight: rand(20..100),
-          created_at: Faker::Time.backward(days: 14, period: :evening)
-        )
-      end
+  # Add tracking data
+  plan.exercises.each do |exercise|
+    3.times do
+      ExerciseTracking.create!(
+        exercise: exercise,
+        user: user,
+        reps: rand(6..15),
+        weight: rand(20..100),
+        created_at: Faker::Time.backward(days: 14, period: :evening)
+      )
     end
   end
 end
+
 Goal.create!([
   { name: "Lose weight" },
   { name: "Build muscle" },
@@ -100,10 +108,8 @@ Lifestyle.create!([
   { name: "Slightly active", description: "Workout 3 times per week" },
   { name: "Sedentary", description: "No workout or works out 1-2 times a week" }
 ])
-puts "Seeding meals and food items..."
 
-Meal.destroy_all
-FoodItem.destroy_all
+puts "Seeding meals and food items..."
 
 # Example for the first user
 calorie_user = users.first
@@ -128,11 +134,12 @@ def create_meal_for(user, type, time, items)
       protein: item[:protein],
       carbs: item[:carbs],
       fats: item[:fats],
-      grams: 100
+      grams: 100,
+      consumed_at: time
     )
   end
 end
-puts "meal_types: #{meal_types.inspect}"
+
 now = Time.zone.now
 
 create_meal_for(calorie_user, meal_types[:breakfast], now.beginning_of_day + 8.hours, [

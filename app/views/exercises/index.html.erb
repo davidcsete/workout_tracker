@@ -5,10 +5,27 @@
   </div>
 
   <ul class="space-y-4">
-    <% @exercises.each do |exercise| %>
-      <turbo-frame id="exercise_<%= exercise.id %>">
-        <%= render partial: "exercise", locals: { exercise: exercise, workout_plan: @workout_plan } %>
-      </turbo-frame>
+    <% weekday_order = %w[Monday Tuesday Wednesday Thursday Friday Saturday Sunday] %>
+    <% @workout_plan_exercises
+        .group_by(&:day_of_the_week)
+        .sort_by { |day, _| weekday_order.index(day.capitalize) || 999 }
+        .each do |day, exercises| %>
+
+      <div class="mt-8">
+        <div class="text-2xl font-semibold text-primary">
+          <%= day.capitalize %>
+        </div>
+        <div class="divider my-2"></div>
+
+        <div class="space-y-4">
+          <% exercises.sort_by(&:order).each do |workout_plan_exercise| %>
+            <turbo-frame id="exercise_<%= workout_plan_exercise.exercise.id %>">
+              <%= render partial: "exercise", locals: { exercise: workout_plan_exercise.exercise, workout_plan: @workout_plan } %>
+            </turbo-frame>
+          <% end %>
+        </div>
+      </div>
     <% end %>
+    <br/>
   </ul>
 </div>
