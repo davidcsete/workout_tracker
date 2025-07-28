@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_20_180045) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_27_055512) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -130,6 +130,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_20_180045) do
     t.bigint "exercise_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "day_of_the_week"
+    t.integer "order"
     t.index ["exercise_id"], name: "index_workout_plan_exercises_on_exercise_id"
     t.index ["workout_plan_id"], name: "index_workout_plan_exercises_on_workout_plan_id"
   end

@@ -20,15 +20,19 @@ class ExerciseTrackingsController < ApplicationController
     @workout_plan = WorkoutPlan.find(params[:workout_plan_id])
     @exercise = Exercise.find(params[:exercise_id])
     @exercise_tracking = ExerciseTracking.new
-  
+
+    @date = params[:date] ? Date.parse(params[:date]) : Date.current
+
     @exercise_trackings = ExerciseTracking
                             .where(exercise: @exercise, user: current_user)
-                            .where("created_at >= ?", Time.zone.now.beginning_of_day)
-                            .order(created_at: :desc)
-  end  
+                            .where("performed_at >= ? AND performed_at < ?", @date.beginning_of_day, @date.end_of_day)
+                            .order(performed_at: :desc)
+  end
 
   # GET /exercise_trackings/1/edit
   def edit
+    @exercise_tracking = ExerciseTracking.find(params[:id])
+    @exercise = @exercise_tracking.exercise
   end
 
   # POST /exercise_trackings or /exercise_trackings.json
@@ -38,15 +42,17 @@ class ExerciseTrackingsController < ApplicationController
     @exercise_tracking = ExerciseTracking.new(exercise_tracking_params)
     @exercise_tracking.exercise = @exercise
     @exercise_tracking.user = current_user
+    # Set the performed_at date to the selected date
+    @date = params[:date] ? Date.parse(params[:date]) : Date.current
+    @exercise_tracking.performed_at = @date
 
     if @exercise_tracking.save
-      # Load today's trackings
-      
+      # Load trackings for the current date
       @exercise_trackings = ExerciseTracking
                               .where(exercise: @exercise, user: current_user)
-                              .where("created_at >= ?", Time.zone.now.beginning_of_day)
-                              .order(created_at: :desc)
-  
+                              .where("performed_at >= ? AND performed_at < ?", @date.beginning_of_day, @date.end_of_day)
+                              .order(performed_at: :desc)
+
       respond_to do |format|
         format.turbo_stream {
           render turbo_stream: [
@@ -58,7 +64,7 @@ class ExerciseTrackingsController < ApplicationController
             turbo_stream.replace(
               "tracking_feed",
               partial: "exercise_trackings/feed",
-              locals: { exercise_trackings: @exercise.exercise_trackings.today_for_user(current_user) }
+              locals: { exercise_trackings: @exercise_trackings }
             )
           ]
         }
@@ -70,7 +76,7 @@ class ExerciseTrackingsController < ApplicationController
       render :new
     end
   end
-  
+
   # PATCH/PUT /exercise_trackings/1 or /exercise_trackings/1.json
   def update
     respond_to do |format|
