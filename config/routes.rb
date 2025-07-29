@@ -1,4 +1,9 @@
 Rails.application.routes.draw do
+  resources :diet_goals, except: [:destroy] do
+    member do
+      patch :regenerate
+    end
+  end
   resources :food_items
   resources :meals do
     resources :food_items, only: [ :new, :create, :edit, :update, :destroy ]

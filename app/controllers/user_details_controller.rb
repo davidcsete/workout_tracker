@@ -11,7 +11,14 @@ class UserDetailsController < ApplicationController
     @user_detail = current_user.build_user_detail(user_detail_params)
 
     if @user_detail.save
-      redirect_to workout_plans_path, notice: "Welcome! Your profile is set up."
+      # Update user gender
+      current_user.update(gender: params[:gender])
+      
+      # Create automatic diet goal
+      diet_goal = DietGoal.generate_for_user(current_user)
+      diet_goal.save if diet_goal
+      
+      redirect_to diet_goals_path, notice: "Welcome! Your profile and nutrition goals are set up."
     else
       @goals = Goal.all
       @lifestyles = Lifestyle.all

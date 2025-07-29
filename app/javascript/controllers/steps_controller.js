@@ -10,7 +10,7 @@ export default class StepsController extends Controller {
   }
 
   next() {
-    if (this.currentStep < 3) {
+    if (this.currentStep < 4) {
       this.currentStep++
       this.updateSteps()
     }

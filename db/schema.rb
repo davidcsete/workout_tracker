@@ -10,9 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_29_075433) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_29_095441) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "diet_goals", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.integer "daily_calories"
+    t.float "protein_percentage"
+    t.float "carb_percentage"
+    t.float "fat_percentage"
+    t.float "weight_change_per_week"
+    t.boolean "is_custom"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_diet_goals_on_user_id"
+  end
 
   create_table "exercise_trackings", force: :cascade do |t|
     t.bigint "user_id", null: false
@@ -117,6 +130,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_29_075433) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "admin", default: false, null: false
+    t.string "gender"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
@@ -146,6 +160,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_29_075433) do
     t.index ["user_id"], name: "index_workout_plans_on_user_id"
   end
 
+  add_foreign_key "diet_goals", "users"
   add_foreign_key "exercise_trackings", "exercises"
   add_foreign_key "exercise_trackings", "users"
   add_foreign_key "exercise_weekdays", "exercises"

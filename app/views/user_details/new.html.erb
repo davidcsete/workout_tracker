@@ -6,6 +6,7 @@
     <li class="step step-primary" data-step="1">Basic Info</li>
     <li class="step" data-step="2">Your Goal</li>
     <li class="step" data-step="3">Lifestyle</li>
+    <li class="step" data-step="4">Complete</li>
   </ul>
 
   <%= form_with model: @user_detail, data: { turbo: false }, html: { id: "multi-step-form" } do |f| %>
@@ -15,6 +16,11 @@
       <div class="form-control mb-4">
         <%= f.label :age, class: "label" do %><span class="label-text">Age</span><% end %>
         <%= f.number_field :age, class: "input input-bordered w-full" %>
+      </div>
+
+      <div class="form-control mb-4">
+        <%= label_tag :gender, class: "label" do %><span class="label-text">Gender</span><% end %>
+        <%= select_tag :gender, options_for_select([['Male', 'male'], ['Female', 'female']]), { class: "select select-bordered w-full" } %>
       </div>
 
       <div class="form-control mb-4">
@@ -58,7 +64,29 @@
 
       <div class="flex justify-between gap-4 flex-col">
         <button type="button" class="btn btn-outline w-full" data-action="click->steps#prev">Back</button>
-        <%= f.submit "Finish", class: "btn btn-success w-full" %>
+        <button type="button" class="btn btn-primary w-full" data-action="click->steps#next">Next</button>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step-pane hidden" data-step-pane="4">
+      <div class="text-center mb-6">
+        <h2 class="text-2xl font-bold mb-4">Ready to Start!</h2>
+        <p class="text-lg opacity-70 mb-4">We'll create your personalized nutrition goals based on your profile.</p>
+        
+        <div class="alert alert-info mb-4">
+          <div class="text-sm">
+            <strong>What happens next:</strong><br>
+            • Your daily calorie target will be calculated<br>
+            • Macro percentages will be set based on your goal<br>
+            • You can customize these later if needed
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-between gap-4 flex-col">
+        <button type="button" class="btn btn-outline w-full" data-action="click->steps#prev">Back</button>
+        <%= f.submit "Complete Setup", class: "btn btn-success w-full" %>
       </div>
     </div>
 

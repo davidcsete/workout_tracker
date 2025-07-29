@@ -1,0 +1,280 @@
+<div class="max-w-2xl mx-auto mt-10 p-6 bg-base-200 rounded-xl shadow-md">
+  <h1 class="text-3xl font-bold mb-6 text-center">Create Custom Nutrition Goals</h1>
+
+  <%= form_with model: @diet_goal, data: { turbo: false } do |f| %>
+    <% if @diet_goal.errors.any? %>
+      <div class="alert alert-error mb-4">
+        <ul>
+          <% @diet_goal.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <!-- Daily Calories -->
+    <div class="form-control mb-6">
+      <%= f.label :daily_calories, class: "label" do %>
+        <span class="label-text text-lg font-semibold">Daily Calories</span>
+      <% end %>
+      <%= f.number_field :daily_calories, class: "input input-bordered w-full text-lg", min: 1000, max: 5000, value: 2000 %>
+      <div class="label">
+        <span class="label-text-alt">Recommended range: 1200-3000 calories</span>
+      </div>
+    </div>
+
+    <!-- Weight Change Goal -->
+    <div class="form-control mb-6">
+      <%= f.label :weight_change_per_week, class: "label" do %>
+        <span class="label-text text-lg font-semibold">Weight Change Goal (kg/week)</span>
+      <% end %>
+      <%= f.number_field :weight_change_per_week, step: 0.1, class: "input input-bordered w-full text-lg", min: -1, max: 1, value: 0 %>
+      <div class="label">
+        <span class="label-text-alt">Negative for weight loss, positive for weight gain</span>
+      </div>
+    </div>
+
+    <!-- Macro Percentages -->
+    <div class="card bg-base-100 shadow-md mb-6">
+      <div class="card-body">
+        <h3 class="card-title text-xl mb-4">Macro Distribution</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Protein -->
+          <div class="form-control">
+            <%= f.label :protein_percentage, class: "label" do %>
+              <span class="label-text font-semibold text-red-500">Protein %</span>
+            <% end %>
+            <%= f.number_field :protein_percentage, step: 0.1, class: "input input-bordered", min: 10, max: 50, value: 25 %>
+            <div class="text-xs text-center mt-1" id="protein-grams">
+              <span class="font-semibold">125.0g</span>
+            </div>
+          </div>
+
+          <!-- Carbs -->
+          <div class="form-control">
+            <%= f.label :carb_percentage, class: "label" do %>
+              <span class="label-text font-semibold text-blue-500">Carbs %</span>
+            <% end %>
+            <%= f.number_field :carb_percentage, step: 0.1, class: "input input-bordered", min: 20, max: 70, value: 45 %>
+            <div class="text-xs text-center mt-1" id="carb-grams">
+              <span class="font-semibold">225.0g</span>
+            </div>
+          </div>
+
+          <!-- Fat -->
+          <div class="form-control">
+            <%= f.label :fat_percentage, class: "label" do %>
+              <span class="label-text font-semibold text-yellow-500">Fat %</span>
+            <% end %>
+            <%= f.number_field :fat_percentage, step: 0.1, class: "input input-bordered", min: 15, max: 50, value: 30 %>
+            <div class="text-xs text-center mt-1" id="fat-grams">
+              <span class="font-semibold">66.7g</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Macro Presets -->
+        <div class="flex flex-wrap gap-2 mt-4 mb-4">
+          <button type="button" class="btn btn-xs btn-outline" onclick="dietCalculator.applyPreset(30, 40, 30)">
+            Weight Loss (30/40/30)
+          </button>
+          <button type="button" class="btn btn-xs btn-outline" onclick="dietCalculator.applyPreset(25, 45, 30)">
+            Muscle Gain (25/45/30)
+          </button>
+          <button type="button" class="btn btn-xs btn-outline" onclick="dietCalculator.applyPreset(20, 50, 30)">
+            Balanced (20/50/30)
+          </button>
+          <button type="button" class="btn btn-xs btn-outline" onclick="dietCalculator.applyPreset(25, 50, 25)">
+            Performance (25/50/25)
+          </button>
+          <button type="button" class="btn btn-xs btn-outline" onclick="dietCalculator.applyPreset(15, 20, 65)">
+            Keto (15/20/65)
+          </button>
+        </div>
+
+        <div class="alert alert-info mt-4">
+          <div class="text-sm">
+            <strong>Note:</strong> Percentages must add up to 100%. 
+            Protein & Carbs = 4 cal/g, Fat = 9 cal/g
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-between gap-4">
+      <%= link_to "Cancel", diet_goals_path, class: "btn btn-outline flex-1" %>
+      <%= f.submit "Create Custom Goals", class: "btn btn-primary flex-1" %>
+    </div>
+  <% end %>
+</div>
+
+<script>
+  class DietGoalCalculator {
+    constructor() {
+      this.calories = 0;
+      this.protein = 0;
+      this.carbs = 0;
+      this.fat = 0;
+      this.isUpdating = false;
+      this.init();
+    }
+
+    init() {
+      this.caloriesInput = document.getElementById('diet_goal_daily_calories');
+      this.proteinInput = document.getElementById('diet_goal_protein_percentage');
+      this.carbsInput = document.getElementById('diet_goal_carb_percentage');
+      this.fatInput = document.getElementById('diet_goal_fat_percentage');
+      this.weightChangeInput = document.getElementById('diet_goal_weight_change_per_week');
+
+      this.proteinGrams = document.getElementById('protein-grams');
+      this.carbGrams = document.getElementById('carb-grams');
+      this.fatGrams = document.getElementById('fat-grams');
+
+      this.addEventListeners();
+      this.updateMacroGrams();
+    }
+
+    addEventListeners() {
+      this.caloriesInput.addEventListener('input', () => this.updateMacroGrams());
+      this.proteinInput.addEventListener('input', () => this.handleMacroChange('protein'));
+      this.carbsInput.addEventListener('input', () => this.handleMacroChange('carbs'));
+      this.fatInput.addEventListener('input', () => this.handleMacroChange('fat'));
+      this.weightChangeInput.addEventListener('input', () => this.suggestCalorieAdjustment());
+    }
+
+    handleMacroChange(changedMacro) {
+      if (this.isUpdating) return;
+      
+      this.isUpdating = true;
+      
+      const protein = parseFloat(this.proteinInput.value) || 0;
+      const carbs = parseFloat(this.carbsInput.value) || 0;
+      const fat = parseFloat(this.fatInput.value) || 0;
+      
+      const total = protein + carbs + fat;
+      
+      if (total > 100) {
+        // Auto-adjust other macros proportionally
+        const remaining = 100 - parseFloat(this[changedMacro + 'Input'].value);
+        const otherTotal = total - parseFloat(this[changedMacro + 'Input'].value);
+        
+        if (otherTotal > 0) {
+          const ratio = remaining / otherTotal;
+          
+          if (changedMacro !== 'protein') {
+            this.proteinInput.value = Math.round(protein * ratio * 10) / 10;
+          }
+          if (changedMacro !== 'carbs') {
+            this.carbsInput.value = Math.round(carbs * ratio * 10) / 10;
+          }
+          if (changedMacro !== 'fat') {
+            this.fatInput.value = Math.round(fat * ratio * 10) / 10;
+          }
+        }
+      }
+      
+      this.updateMacroGrams();
+      this.updatePercentageIndicator();
+      this.isUpdating = false;
+    }
+
+    updateMacroGrams() {
+      const calories = parseFloat(this.caloriesInput.value) || 0;
+      const protein = parseFloat(this.proteinInput.value) || 0;
+      const carbs = parseFloat(this.carbsInput.value) || 0;
+      const fat = parseFloat(this.fatInput.value) || 0;
+      
+      const proteinGrams = Math.round(calories * protein / 100 / 4 * 10) / 10;
+      const carbGrams = Math.round(calories * carbs / 100 / 4 * 10) / 10;
+      const fatGrams = Math.round(calories * fat / 100 / 9 * 10) / 10;
+      
+      this.proteinGrams.innerHTML = `<span class="font-semibold">${proteinGrams}g</span>`;
+      this.carbGrams.innerHTML = `<span class="font-semibold">${carbGrams}g</span>`;
+      this.fatGrams.innerHTML = `<span class="font-semibold">${fatGrams}g</span>`;
+      
+      this.updatePercentageIndicator();
+    }
+
+    updatePercentageIndicator() {
+      const protein = parseFloat(this.proteinInput.value) || 0;
+      const carbs = parseFloat(this.carbsInput.value) || 0;
+      const fat = parseFloat(this.fatInput.value) || 0;
+      const total = protein + carbs + fat;
+      
+      const indicator = document.getElementById('percentage-indicator') || this.createPercentageIndicator();
+      
+      if (total === 100) {
+        indicator.className = 'alert alert-success mt-2';
+        indicator.innerHTML = '<div class="text-sm">✓ Perfect! Macros add up to 100%</div>';
+      } else if (total < 100) {
+        indicator.className = 'alert alert-warning mt-2';
+        indicator.innerHTML = `<div class="text-sm">⚠ Total: ${total}% (${100 - total}% remaining)</div>`;
+      } else {
+        indicator.className = 'alert alert-error mt-2';
+        indicator.innerHTML = `<div class="text-sm">⚠ Total: ${total}% (${total - 100}% over limit)</div>`;
+      }
+    }
+
+    createPercentageIndicator() {
+      const indicator = document.createElement('div');
+      indicator.id = 'percentage-indicator';
+      const macroCard = document.querySelector('.card .card-body');
+      macroCard.appendChild(indicator);
+      return indicator;
+    }
+
+    suggestCalorieAdjustment() {
+      const weightChange = parseFloat(this.weightChangeInput.value) || 0;
+      const currentCalories = parseFloat(this.caloriesInput.value) || 2000;
+      
+      // 1kg = ~7700 calories, so weekly change / 7 = daily adjustment
+      const dailyAdjustment = (weightChange * 7700) / 7;
+      
+      if (Math.abs(weightChange) > 0.1) {
+        const suggestion = document.getElementById('calorie-suggestion') || this.createCalorieSuggestion();
+        const suggestedCalories = Math.round(currentCalories + dailyAdjustment);
+        
+        suggestion.className = 'alert alert-info mt-2';
+        suggestion.innerHTML = `
+          <div class="text-sm">
+            <strong>💡 Suggestion:</strong> For ${weightChange > 0 ? 'gaining' : 'losing'} ${Math.abs(weightChange)}kg/week, 
+            consider ${suggestedCalories} calories/day 
+            <button type="button" class="btn btn-xs btn-primary ml-2" onclick="dietCalculator.applyCalorieSuggestion(${suggestedCalories})">
+              Apply
+            </button>
+          </div>
+        `;
+      } else {
+        const suggestion = document.getElementById('calorie-suggestion');
+        if (suggestion) suggestion.remove();
+      }
+    }
+
+    createCalorieSuggestion() {
+      const suggestion = document.createElement('div');
+      suggestion.id = 'calorie-suggestion';
+      this.weightChangeInput.parentNode.appendChild(suggestion);
+      return suggestion;
+    }
+
+    applyCalorieSuggestion(calories) {
+      this.caloriesInput.value = calories;
+      this.updateMacroGrams();
+      document.getElementById('calorie-suggestion').remove();
+    }
+
+    applyPreset(protein, carbs, fat) {
+      this.proteinInput.value = protein;
+      this.carbsInput.value = carbs;
+      this.fatInput.value = fat;
+      this.updateMacroGrams();
+      this.updatePercentageIndicator();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    window.dietCalculator = new DietGoalCalculator();
+  });
+</script>
