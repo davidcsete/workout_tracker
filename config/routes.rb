@@ -8,6 +8,7 @@ Rails.application.routes.draw do
       get :search
     end
   end
+
   resources :home, only: [ :index ]
   resources :user_details, only: [ :new, :create, :edit, :update ]
   get "dashboard/index"
@@ -22,6 +23,7 @@ Rails.application.routes.draw do
   end
   namespace :api do
     resources :exercise_trackings, only: [ :index ]
+    resources :barcodes, only: [ :index ]
   end
   get "dashboard", to: "dashboard#index"
   post "/chatbots", to: "chatbots#create"

@@ -94,13 +94,13 @@ users.each do |user|
 end
 
 Goal.create!([
-  { name: "Lose weight" },
-  { name: "Build muscle" },
-  { name: "Lose weight and build muscle" },
-  { name: "Be more active" },
-  { name: "Gain weight and build muscle" },
-  { name: "Get stronger" },
-  { name: "Get stronger and build more muscle" }
+  { name: "Lose weight", goal_type: :lose_weight },
+  { name: "Build muscle", goal_type: :build_muscle },
+  { name: "Lose weight and build muscle", goal_type: :lose_weight_and_build_muscle },
+  { name: "Be more active", goal_type: :be_more_active },
+  { name: "Gain weight and build muscle", goal_type: :gain_weight_and_build_muscle },
+  { name: "Get stronger", goal_type: :get_stronger },
+  { name: "Get stronger and build more muscle", goal_type: :get_stronger_and_build_more_muscle }
 ])
 
 Lifestyle.create!([
