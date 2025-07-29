@@ -1,0 +1,161 @@
+<div class="max-w-2xl mx-auto mt-10 p-6 bg-base-200 rounded-xl shadow-md" data-controller="diet-goal-calculator">
+  <h1 class="text-3xl font-bold mb-6 text-center">Customize Your Nutrition Goals</h1>
+
+  <%= form_with model: @diet_goal, data: { turbo: false } do |f| %>
+    <% if @diet_goal.errors.any? %>
+      <div class="alert alert-error mb-4">
+        <ul>
+          <% @diet_goal.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <!-- Daily Calories -->
+    <div class="form-control mb-6">
+      <%= f.label :daily_calories, class: "label" do %>
+        <span class="label-text text-lg font-semibold">Daily Calories</span>
+      <% end %>
+      <%= f.number_field :daily_calories, 
+          class: "input input-bordered w-full text-lg", 
+          min: 1000, max: 5000,
+          data: { 
+            diet_goal_calculator_target: "dailyCalories",
+            action: "input->diet-goal-calculator#caloriesChanged"
+          } %>
+      <div class="label">
+        <span class="label-text-alt">Recommended range: 1200-3000 calories</span>
+      </div>
+    </div>
+
+    <!-- Weight Change Goal -->
+    <div class="form-control mb-6">
+      <%= f.label :weight_change_per_week, class: "label" do %>
+        <span class="label-text text-lg font-semibold">Weight Change Goal (kg/week)</span>
+      <% end %>
+      <%= f.number_field :weight_change_per_week, 
+          step: 0.1, 
+          class: "input input-bordered w-full text-lg", 
+          min: -1, max: 1,
+          data: { 
+            diet_goal_calculator_target: "weightChange",
+            action: "input->diet-goal-calculator#weightChangeChanged"
+          } %>
+      <div class="label">
+        <span class="label-text-alt">Negative for weight loss, positive for weight gain</span>
+      </div>
+      <div data-diet-goal-calculator-target="calorieSuggestion" style="display: none;"></div>
+    </div>
+
+    <!-- Macro Percentages -->
+    <div class="card bg-base-100 shadow-md mb-6">
+      <div class="card-body">
+        <h3 class="card-title text-xl mb-4">Macro Distribution</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Protein -->
+          <div class="form-control">
+            <%= f.label :protein_percentage, class: "label" do %>
+              <span class="label-text font-semibold text-red-500">Protein %</span>
+            <% end %>
+            <%= f.number_field :protein_percentage, 
+                step: 0.1, 
+                class: "input input-bordered", 
+                min: 10, max: 50,
+                data: { 
+                  diet_goal_calculator_target: "proteinPercentage",
+                  macro: "protein",
+                  action: "input->diet-goal-calculator#macroChanged"
+                } %>
+            <div class="text-xs text-center mt-1" data-diet-goal-calculator-target="proteinGrams">
+              <span class="font-semibold"><%= @diet_goal.protein_grams %>g</span>
+            </div>
+          </div>
+
+          <!-- Carbs -->
+          <div class="form-control">
+            <%= f.label :carb_percentage, class: "label" do %>
+              <span class="label-text font-semibold text-blue-500">Carbs %</span>
+            <% end %>
+            <%= f.number_field :carb_percentage, 
+                step: 0.1, 
+                class: "input input-bordered", 
+                min: 20, max: 70,
+                data: { 
+                  diet_goal_calculator_target: "carbPercentage",
+                  macro: "carbs",
+                  action: "input->diet-goal-calculator#macroChanged"
+                } %>
+            <div class="text-xs text-center mt-1" data-diet-goal-calculator-target="carbGrams">
+              <span class="font-semibold"><%= @diet_goal.carb_grams %>g</span>
+            </div>
+          </div>
+
+          <!-- Fat -->
+          <div class="form-control">
+            <%= f.label :fat_percentage, class: "label" do %>
+              <span class="label-text font-semibold text-yellow-500">Fat %</span>
+            <% end %>
+            <%= f.number_field :fat_percentage, 
+                step: 0.1, 
+                class: "input input-bordered", 
+                min: 15, max: 50,
+                data: { 
+                  diet_goal_calculator_target: "fatPercentage",
+                  macro: "fat",
+                  action: "input->diet-goal-calculator#macroChanged"
+                } %>
+            <div class="text-xs text-center mt-1" data-diet-goal-calculator-target="fatGrams">
+              <span class="font-semibold"><%= @diet_goal.fat_grams %>g</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Macro Presets -->
+        <div class="flex flex-wrap gap-2 mt-4 mb-4">
+          <button type="button" class="btn btn-xs btn-outline" 
+                  data-action="click->diet-goal-calculator#applyPreset" 
+                  data-preset="weight-loss">
+            Weight Loss (30/40/30)
+          </button>
+          <button type="button" class="btn btn-xs btn-outline" 
+                  data-action="click->diet-goal-calculator#applyPreset" 
+                  data-preset="muscle-gain">
+            Muscle Gain (25/45/30)
+          </button>
+          <button type="button" class="btn btn-xs btn-outline" 
+                  data-action="click->diet-goal-calculator#applyPreset" 
+                  data-preset="balanced">
+            Balanced (20/50/30)
+          </button>
+          <button type="button" class="btn btn-xs btn-outline" 
+                  data-action="click->diet-goal-calculator#applyPreset" 
+                  data-preset="performance">
+            Performance (25/50/25)
+          </button>
+          <button type="button" class="btn btn-xs btn-outline" 
+                  data-action="click->diet-goal-calculator#applyPreset" 
+                  data-preset="keto">
+            Keto (15/20/65)
+          </button>
+        </div>
+
+        <div data-diet-goal-calculator-target="percentageIndicator" class="alert alert-info mt-4">
+          <div class="text-sm">
+            <strong>Note:</strong> Percentages must add up to 100%. 
+            Protein & Carbs = 4 cal/g, Fat = 9 cal/g
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-between gap-4">
+      <%= link_to "Cancel", diet_goals_path, class: "btn btn-outline flex-1" %>
+      <%= f.submit "Save Custom Goals", class: "btn btn-primary flex-1" %>
+    </div>
+  <% end %>
+</div>
+
+
