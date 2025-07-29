@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_27_055512) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_29_075433) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -72,6 +72,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_27_055512) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "goal_type", default: 0, null: false
+    t.index ["goal_type"], name: "index_goals_on_goal_type"
   end
 
   create_table "lifestyles", force: :cascade do |t|

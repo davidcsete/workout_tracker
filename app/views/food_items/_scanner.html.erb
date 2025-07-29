@@ -18,7 +18,15 @@
       type="text" 
       id="barcode_result" 
       placeholder="Scanned barcode will appear here" 
-      class="input input-bordered w-full" />
+      class="input input-bordered w-full mb-2" readonly />
+    
+    <!-- API Result Display -->
+    <div id="api_result" class="hidden">
+      <div class="alert alert-info mb-2">
+        <span id="loading_message">🔍 Looking up barcode...</span>
+      </div>
+      <div id="food_data" class="bg-base-200 p-3 rounded-md text-sm"></div>
+    </div>
 
     <div class="modal-action mt-4">
       <form method="dialog">
@@ -256,11 +264,13 @@
           navigator.vibrate(200);
         }
         
+        // Show the scanned barcode in the input field
         document.getElementById("barcode_result").value = code;
-        console.log("Barcode set in input field:", code);
+        console.log("Barcode detected:", code);
         
-        // Stop scanner but keep modal open so user can see the result
+        // Stop scanner and make API request
         stopBarcodeScanner();
+        fetchBarcodeData(code);
       }
     });
   }
@@ -303,6 +313,151 @@
     console.log("Modal closed, stopping scanner");
     stopBarcodeScanner();
   });
+
+  // Function to fetch barcode data from API
+  async function fetchBarcodeData(barcode) {
+    console.log("=== Fetching Barcode Data ===");
+    console.log("Barcode:", barcode);
+    
+    const apiResult = document.getElementById("api_result");
+    const loadingMessage = document.getElementById("loading_message");
+    const foodData = document.getElementById("food_data");
+    
+    // Show loading state
+    apiResult.classList.remove("hidden");
+    loadingMessage.textContent = "🔍 Looking up barcode...";
+    foodData.innerHTML = "";
+    
+    try {
+      const response = await fetch(`/api/barcodes?barcode=${encodeURIComponent(barcode)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        console.log("API Response:", data);
+        
+        // Check if we have food details from the second API call
+        if (data.food_details && data.food_details.food && data.food_details.food.food_name) {
+          const food = data.food_details.food;
+          loadingMessage.textContent = "✅ Food found! Filling form...";
+          
+          // Fill in the form with food data
+          fillFormWithFoodData(food);
+          
+          // Display success message
+          foodData.innerHTML = `
+            <div class="space-y-2">
+              <div class="text-success">
+                <p><strong>✅ Form filled with:</strong> ${food.food_name}</p>
+                <p class="text-sm">You can now adjust the serving size and nutrition values as needed.</p>
+              </div>
+            </div>
+          `;
+          
+          // Auto-close modal after a short delay
+          setTimeout(() => {
+            document.getElementById("barcode_modal").close();
+          }, 2000);
+          
+        } else {
+          loadingMessage.textContent = "✅ Barcode found but no detailed food info available";
+          
+          // Display the barcode data
+          foodData.innerHTML = `
+            <div class="space-y-2">
+              <pre class="text-xs overflow-auto">${JSON.stringify(data, null, 2)}</pre>
+            </div>
+          `;
+        }
+      } else {
+        console.error("API Error:", data);
+        loadingMessage.textContent = "❌ Error looking up barcode";
+        foodData.innerHTML = `
+          <div class="text-error">
+            <p><strong>Error:</strong> ${data.error || 'Unknown error occurred'}</p>
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error("Fetch Error:", error);
+      loadingMessage.textContent = "❌ Network error";
+      foodData.innerHTML = `
+        <div class="text-error">
+          <p><strong>Network Error:</strong> ${error.message}</p>
+        </div>
+      `;
+    }
+  }
+
+  // Function to fill form with food data from API response
+  function fillFormWithFoodData(food) {
+    console.log("=== Filling Form with Food Data ===");
+    console.log("Food data:", food);
+    
+    // Fill in the food name
+    const nameInput = document.querySelector('input[name="food_item[name]"]');
+    if (nameInput && food.food_name) {
+      nameInput.value = food.food_name;
+      console.log("Set name:", food.food_name);
+    }
+    
+    // Use the first serving (100g) as default if available
+    const servings = food.servings?.serving;
+    if (servings && servings.length > 0) {
+      // Find 100g serving or use first serving
+      const defaultServing = servings.find(s => s.serving_description === "100 g") || servings[0];
+      
+      console.log("Using serving:", defaultServing);
+      
+      // Set default grams (use metric_serving_amount or default to 100)
+      const gramsInput = document.querySelector('input[name="food_item[grams]"]');
+      if (gramsInput) {
+        const grams = defaultServing.metric_serving_amount || "100";
+        gramsInput.value = Math.round(parseFloat(grams));
+        console.log("Set grams:", grams);
+      }
+      
+      // Fill nutrition values
+      const caloriesInput = document.querySelector('input[name="food_item[calories]"]');
+      if (caloriesInput && defaultServing.calories) {
+        caloriesInput.value = Math.round(parseFloat(defaultServing.calories));
+        console.log("Set calories:", defaultServing.calories);
+      }
+      
+      const proteinInput = document.querySelector('input[name="food_item[protein]"]');
+      if (proteinInput && defaultServing.protein) {
+        proteinInput.value = parseFloat(defaultServing.protein).toFixed(1);
+        console.log("Set protein:", defaultServing.protein);
+      }
+      
+      const carbsInput = document.querySelector('input[name="food_item[carbs]"]');
+      if (carbsInput && defaultServing.carbohydrate) {
+        carbsInput.value = parseFloat(defaultServing.carbohydrate).toFixed(1);
+        console.log("Set carbs:", defaultServing.carbohydrate);
+      }
+      
+      const fatsInput = document.querySelector('input[name="food_item[fats]"]');
+      if (fatsInput && defaultServing.fat) {
+        fatsInput.value = parseFloat(defaultServing.fat).toFixed(1);
+        console.log("Set fats:", defaultServing.fat);
+      }
+    }
+    
+    // Set food_id if available
+    const foodIdInput = document.querySelector('input[name="food_item[food_id]"]');
+    if (foodIdInput && food.food_id) {
+      foodIdInput.value = food.food_id;
+      console.log("Set food_id:", food.food_id);
+    }
+    
+    console.log("Form filling completed");
+  }
 
   // Test function you can call from console
   window.testBarcodeScanner = function() {

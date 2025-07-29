@@ -1,4 +1,4 @@
-class Api::ExerciseTrackingsController < ApplicationController
+class Api::ExerciseTrackingsController < Api::BaseController
   # before_action :set_exercise_tracking, only: %i[ show edit update destroy ]
   # respond_to :html, :turbo_stream
 
