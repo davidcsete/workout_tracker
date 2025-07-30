@@ -115,35 +115,5 @@
     </div>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const inputs = ['food-grams', 'food-protein', 'food-carbs', 'food-fat'];
-      const result = document.getElementById('calc-result');
-      
-      function calculateMacros() {
-        const grams = parseFloat(document.getElementById('food-grams').value) || 0;
-        const proteinPct = parseFloat(document.getElementById('food-protein').value) || 0;
-        const carbsPct = parseFloat(document.getElementById('food-carbs').value) || 0;
-        const fatPct = parseFloat(document.getElementById('food-fat').value) || 0;
-        
-        if (grams > 0 && (proteinPct > 0 || carbsPct > 0 || fatPct > 0)) {
-          const proteinG = (grams * proteinPct / 100).toFixed(1);
-          const carbsG = (grams * carbsPct / 100).toFixed(1);
-          const fatG = (grams * fatPct / 100).toFixed(1);
-          const calories = (proteinG * 4 + carbsG * 4 + fatG * 9).toFixed(0);
-          
-          result.innerHTML = `
-            <strong>${calories} calories:</strong> 
-            ${proteinG}g protein, ${carbsG}g carbs, ${fatG}g fat
-          `;
-        } else {
-          result.innerHTML = 'Enter values to see macro breakdown';
-        }
-      }
-      
-      inputs.forEach(id => {
-        document.getElementById(id).addEventListener('input', calculateMacros);
-      });
-    });
-  </script>
+
 </div>

@@ -1,18 +1,22 @@
-<% content_for :title, "Editing workout plan" %>
+<div class="my-2">
+  <% content_for :title, "Editing workout plan" %>
 
-<div class="w-full">
-  <h1 class="font-bold text-4xl">Editing workout plan</h1>
+  <div class="w-full">
+    <h1 class="font-bold text-4xl">Editing workout plan</h1>
+      <div class="mb-4">
 
-  <%= render "form", workout_plan: @workout_plan %>
-
-  <%= link_to "Show this workout plan", @workout_plan, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 btn btn-info inline-block font-medium" %>
-  <%= link_to "Back to workout plans", workout_plans_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 btn btn-secondary inline-block font-medium" %>
-  <%= link_to "Add new exercise", new_workout_plan_exercise_path(@workout_plan), class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 btn btn-primary inline-block font-medium" %>
-    <ul class="space-y-3">
-    <% @workout_plan.exercises.each do |exercise| %>
-      <turbo-frame id="exercise_<%= exercise.id %>">
-        <%= render partial: "exercises/exercise", locals: { exercise: exercise, workout_plan: @workout_plan } %>
-      </turbo-frame>
-    <% end %>
-    </ul>
+        <%= render "form", workout_plan: @workout_plan %>
+      
+        <%= link_to "Show this workout plan", @workout_plan, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 btn btn-info inline-block font-medium" %>
+        <%= link_to "Back to workout plans", workout_plans_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 btn btn-secondary inline-block font-medium" %>
+        <%= link_to "Add new exercise", new_workout_plan_exercise_path(@workout_plan), class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 btn btn-primary inline-block font-medium" %>
+    </div>  
+      <ul class="space-y-3">
+      <% @workout_plan.exercises.each do |exercise| %>
+        <turbo-frame id="exercise_<%= exercise.id %>">
+          <%= render partial: "exercises/exercise", locals: { exercise: exercise, workout_plan: @workout_plan } %>
+        </turbo-frame>
+      <% end %>
+      </ul>
+  </div>
 </div>

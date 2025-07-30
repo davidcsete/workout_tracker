@@ -10,6 +10,14 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <%# Apply theme immediately to prevent flash %>
+    <script>
+      (function() {
+        const theme = localStorage.getItem('theme') || 'default';
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
+
     <%= yield :head %>
 
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>

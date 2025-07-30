@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :diet_goals, except: [:destroy] do
+  resources :diet_goals, except: [ :destroy ] do
     member do
       patch :regenerate
     end
@@ -20,7 +20,9 @@ Rails.application.routes.draw do
   resources :exercise_trackings
   resources :exercises
   root to: "home#index"
-  devise_for :users
+  devise_for :users, controllers: {
+    registrations: "users/registrations"
+  }
   resources :workout_plans do
     resources :exercises, only: [ :index, :new, :create ] do
       resources :exercise_trackings, only: [ :new, :create ]
