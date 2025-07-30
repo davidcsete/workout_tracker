@@ -5,9 +5,9 @@
     <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
   <% end %>
 
-  <div class="flex justify-between items-center">
+  <div class="flex justify-between items-center my-4">
     <h1 class="font-bold text-4xl">Exercise trackings</h1>
-    <%= link_to "New exercise tracking", new_exercise_tracking_path(workout_plan_id: @workout_plan.id, exercise_id: @exercise.id), class: "btn btn-primary px-3.5 py-2.5 block font-medium" %>
+    <%= link_to "Back to tracking", new_exercise_tracking_path(workout_plan_id: @workout_plan.id, exercise_id: @exercise.id), class: "btn btn-accent px-3.5 py-2.5 block font-medium" %>
   </div>
 
   <div id="exercise_trackings" class="min-w-full divide-y divide-gray-200 space-y-5">
@@ -23,7 +23,7 @@
               <div class="card-actions justify-end">
                 <div class="flex flex-col sm:flex-row gap-2">
                   <%= link_to "Show", exercise_tracking, class: "btn btn-info btn-sm" %>
-                  <%= link_to "Edit", edit_exercise_tracking_path(exercise_tracking), class: "btn btn-accent btn-sm" %>
+                  <%= link_to "Edit", edit_exercise_tracking_path(exercise_tracking,workout_plan_id: @workout_plan.id, exercise_id: @exercise.id), class: "btn btn-accent btn-sm" %>
                   <%= button_to "Destroy", exercise_tracking, method: :delete, class: "btn btn-secondary btn-sm", data: { turbo_confirm: "Are you sure?" } %>
                 </div>
               </div>

@@ -2,6 +2,7 @@ class HomeController < ApplicationController
   before_action :authenticate_user!
   def index
     today_macros
+    @recent_tracking = current_user.exercise_trackings.order(created_at: :desc).limit(10)
   end
 
   private
