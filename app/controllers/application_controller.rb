@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
     if resource.user_detail.nil?
       new_user_detail_path
     else
-      workout_plans_path
+      root_path
     end
   end
 end
