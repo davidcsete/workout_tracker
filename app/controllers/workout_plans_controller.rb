@@ -85,9 +85,20 @@ class WorkoutPlansController < ApplicationController
         )
       end
 
-      redirect_to workout_plans_path, notice: "Workout plan copied successfully!"
+      respond_to do |format|
+        format.html { redirect_to workout_plans_path, notice: "Workout plan copied successfully!" }
+        format.turbo_stream {
+          flash.now[:notice] = "Workout plan copied successfully!"
+        }
+      end
     else
-      redirect_to workout_plans_path, alert: "Failed to copy workout plan."
+      respond_to do |format|
+        format.html { redirect_to workout_plans_path, alert: "Failed to copy workout plan." }
+        format.turbo_stream {
+          flash.now[:alert] = "Failed to copy workout plan."
+          render turbo_stream: turbo_stream.replace("flash", partial: "shared/flash")
+        }
+      end
     end
   end
 
@@ -97,6 +108,9 @@ class WorkoutPlansController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to workout_plans_path, status: :see_other, notice: "Workout plan was successfully destroyed." }
+      format.turbo_stream {
+        flash.now[:notice] = "Workout plan was successfully destroyed."
+      }
       format.json { head :no_content }
     end
   end

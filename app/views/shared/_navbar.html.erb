@@ -29,14 +29,16 @@
               <path d="M1799 349l242 241-1017 1017L7 590l242-241 775 775 775-775z"></path>
             </svg>
           </div>
-          <ul tabindex="0" id="theme-switcher" class="dropdown-content bg-base-300 rounded-box z-1 w-52 p-2 shadow-2xl">
+          <ul tabindex="0" id="theme-switcher" class="dropdown-content bg-base-300 rounded-box z-1 w-52 p-2 shadow-2xl" data-controller="theme">
             <li>
               <input
                 type="radio"
                 name="theme-dropdown"
                 class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
                 aria-label="Default"
-                value="default" />
+                value="default"
+                data-theme-target="radio"
+                data-action="change->theme#change" />
             </li>
             <li>
               <input
@@ -44,7 +46,9 @@
                 name="theme-dropdown"
                 class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
                 aria-label="Light"
-                value="light" />
+                value="light"
+                data-theme-target="radio"
+                data-action="change->theme#change" />
             </li>
             <li>
               <input
@@ -52,7 +56,9 @@
                 name="theme-dropdown"
                 class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
                 aria-label="Dark"
-                value="dark" />
+                value="dark"
+                data-theme-target="radio"
+                data-action="change->theme#change" />
             </li>
             <li>
               <input
@@ -60,7 +66,9 @@
                 name="theme-dropdown"
                 class="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
                 aria-label="CyberPunk"
-                value="cyberpunk" />
+                value="cyberpunk"
+                data-theme-target="radio"
+                data-action="change->theme#change" />
             </li>
           </ul>
         </div>

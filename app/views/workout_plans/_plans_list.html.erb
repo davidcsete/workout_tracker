@@ -1,0 +1,52 @@
+<!-- My Plans Section -->
+<% my_plans = workout_plans.select { |plan| plan.user == current_user } %>
+<% if my_plans.any? %>
+  <div class="mb-6 sm:mb-8" data-section="my-plans" data-workout-plans-target="section">
+    <div class="divider">
+      <h2 class="text-xl sm:text-2xl font-bold flex items-center gap-2">
+        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-primary" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        My Workout Plans
+      </h2>
+    </div>
+    <div id="workout_plans_list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <% my_plans.each do |plan| %>
+        <%= render partial: 'workout_plans/workout_plan', locals: { workout_plan: plan, is_owner: true } %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<!-- Community Plans Section -->
+<% community_plans = workout_plans.select { |plan| plan.user != current_user } %>
+<% if community_plans.any? %>
+  <div data-section="community-plans" data-workout-plans-target="section">
+    <div class="divider">
+      <h2 class="text-xl sm:text-2xl font-bold flex items-center gap-2">
+        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-secondary" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
+        </svg>
+        Community Plans
+      </h2>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <% community_plans.each do |plan| %>
+        <%= render partial: 'workout_plans/workout_plan', locals: { workout_plan: plan, is_owner: false } %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<% if workout_plans.empty? %>
+  <div class="hero bg-base-200 rounded-box">
+    <div class="hero-content text-center py-8 sm:py-12">
+      <div class="max-w-md px-4">
+        <div class="text-6xl sm:text-8xl lg:text-9xl mb-4">💪</div>
+        <h1 class="text-2xl sm:text-3xl font-bold">No workout plans yet</h1>
+        <p class="py-4 sm:py-6 text-sm sm:text-base">Get started by creating your first workout plan and begin your fitness journey!</p>
+        <%= link_to "Create Your First Plan", new_workout_plan_path, class: "btn btn-primary btn-lg w-full sm:w-auto" %>
+      </div>
+    </div>
+  </div>
+<% end %>

@@ -7,6 +7,7 @@ pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 pin_all_from "app/javascript/controllers", under: "controllers"
 pin "page_transitions", to: "page_transitions.js"
 pin "theme_handler", to: "theme_handler.js"
+pin "theme_persistence", to: "theme_persistence.js"
 
 pin "@rails/ujs", to: "rails-ujs.js"
 pin "steps_controller", to: "controllers/steps_controller.js"

@@ -1,0 +1,10 @@
+<% if current_user.workout_plans.count == 1 %>
+  <%# If this is the user's first plan, reload the entire frame to show the "My Plans" section %>
+  <%= turbo_stream.replace "workout_plans" do %>
+    <%= render "workout_plans/plans_list", workout_plans: WorkoutPlan.includes(:user, :exercises, exercises: :exercise_trackings).order(Arel.sql("CASE WHEN user_id = #{current_user.id} THEN 0 ELSE 1 END")).uniq %>
+  <% end %>
+<% else %>
+  <%# Otherwise just prepend to the existing list %>
+  <%= turbo_stream.prepend "workout_plans_list", partial: "workout_plans/workout_plan", locals: { workout_plan: @workout_plan, is_owner: true } %>
+<% end %>
+<%= turbo_stream.replace "flash-container", partial: "layouts/flash" %>

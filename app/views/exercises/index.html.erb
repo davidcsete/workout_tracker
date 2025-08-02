@@ -1,17 +1,17 @@
-<div class="min-h-screen bg-gradient-to-br from-base-100 to-base-200" 
+<div class="min-h-screen bg-gradient-to-br from-base-100 to-base-200 pb-20" 
      data-controller="workout-exercises"
      data-workout-exercises-workout-plan-id-value="<%= @workout_plan.id %>"
      data-workout-exercises-total-exercises-value="<%= @workout_plan_exercises.count %>"
      data-workout-exercises-completed-today-value="<%= @workout_plan_exercises.joins(exercise: :exercise_trackings).where(exercise_trackings: { performed_at: Date.current.beginning_of_day..Date.current.end_of_day }).distinct.count %>">
   <!-- Header Section -->
-  <div class="hero bg-gradient-to-r from-primary to-secondary text-primary-content py-8">
-    <div class="hero-content text-center max-w-4xl">
-      <div>
-        <div class="flex items-center justify-center gap-3 mb-4">
-          <h1 class="text-3xl font-bold"><%= @workout_plan.name %></h1>
+  <div class="hero bg-gradient-to-r from-primary to-secondary text-primary-content py-6 sm:py-8">
+    <div class="hero-content text-center max-w-4xl px-4">
+      <div class="w-full">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
+          <h1 class="text-2xl sm:text-3xl font-bold text-center"><%= @workout_plan.name %></h1>
         </div>
-        <p class="text-lg opacity-90">Your personalized workout journey</p>
-        <%= link_to workout_plans_path, class: "btn btn-ghost btn-sm mt-4" do %>
+        <p class="text-base sm:text-lg opacity-90 mb-4">Your personalized workout journey</p>
+        <%= link_to workout_plans_path, class: "btn btn-ghost btn-sm" do %>
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
           </svg>
@@ -24,16 +24,16 @@
   <!-- Search and Filter Section -->
   <div class="px-4 py-4 max-w-6xl mx-auto">
     <div class="card bg-base-100 shadow-lg mb-6">
-      <div class="card-body p-4">
-        <div class="flex flex-col gap-4 items-center">
-          <!-- Search Input - Centered -->
-          <div class="form-control w-full max-w-md">
-            <div class="input-group justify-center">
+      <div class="card-body p-4 sm:p-6">
+        <div class="flex flex-col gap-4">
+          <!-- Search Input -->
+          <div class="form-control w-full">
+            <div class="input-group">
               <input type="text" 
                      placeholder="Search exercises..." 
-                     class="input input-bordered w-full"
+                     class="input input-bordered w-full h-12"
                      data-action="input->workout-exercises#searchExercises">
-              <button class="btn btn-square btn-ghost">
+              <button class="btn btn-square h-12">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
@@ -41,11 +41,11 @@
             </div>
           </div>
           
-          <!-- Filters Row - Centered -->
-          <div class="flex flex-col sm:flex-row gap-4 items-center">
+          <!-- Filters Row -->
+          <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
             <!-- Day Filter -->
-            <div class="form-control">
-              <select class="select select-bordered" data-action="change->workout-exercises#filterByDay">
+            <div class="form-control flex-1 sm:flex-none">
+              <select class="select select-bordered h-12" data-action="change->workout-exercises#filterByDay">
                 <option value="all">All Days</option>
                 <% %w[Monday Tuesday Wednesday Thursday Friday Saturday Sunday].each do |day| %>
                   <option value="<%= day.downcase %>"><%= day %></option>
@@ -54,9 +54,9 @@
             </div>
             
             <!-- View Toggle -->
-            <div class="btn-group">
-              <button class="btn btn-sm btn-active">Grid</button>
-              <button class="btn btn-sm">List</button>
+            <div class="btn-group flex-1 sm:flex-none">
+              <button class="btn btn-sm btn-active flex-1 sm:flex-none h-12">Grid</button>
+              <button class="btn btn-sm flex-1 sm:flex-none h-12">List</button>
             </div>
           </div>
         </div>
@@ -66,45 +66,45 @@
 
   <!-- Progress Overview -->
   <div class="px-4 py-2 max-w-6xl mx-auto">
-    <div class="stats shadow-lg bg-base-100 w-full mb-8">
-      <div class="stat">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 sm:mb-8">
+      <div class="stat bg-base-100 shadow-lg rounded-lg p-4">
         <div class="stat-figure text-primary">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
           </svg>
         </div>
-        <div class="stat-title">Total Exercises</div>
-        <div class="stat-value text-primary"><%= @workout_plan_exercises.count %></div>
-        <div class="stat-desc">Across all days</div>
+        <div class="stat-title text-sm">Total Exercises</div>
+        <div class="stat-value text-primary text-2xl sm:text-3xl"><%= @workout_plan_exercises.count %></div>
+        <div class="stat-desc text-xs">Across all days</div>
       </div>
       
-      <div class="stat">
+      <div class="stat bg-base-100 shadow-lg rounded-lg p-4">
         <div class="stat-figure text-secondary">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
           </svg>
         </div>
-        <div class="stat-title">This Week</div>
-        <div class="stat-value text-secondary">
+        <div class="stat-title text-sm">This Week</div>
+        <div class="stat-value text-secondary text-2xl sm:text-3xl">
           <%= @workout_plan_exercises.joins(exercise: :exercise_trackings)
                 .where(exercise_trackings: { performed_at: 1.week.ago.beginning_of_day..Time.current })
                 .distinct.count %>
         </div>
-        <div class="stat-desc">Exercises completed</div>
+        <div class="stat-desc text-xs">Exercises completed</div>
       </div>
       
-      <div class="stat">
+      <div class="stat bg-base-100 shadow-lg rounded-lg p-4">
         <div class="stat-figure text-accent">
           <% weekly_progress = @workout_plan_exercises.count > 0 ? (@workout_plan_exercises.joins(exercise: :exercise_trackings).where(exercise_trackings: { performed_at: 1.week.ago.beginning_of_day..Time.current }).distinct.count.to_f / @workout_plan_exercises.count * 100).round : 0 %>
-          <div class="radial-progress text-accent" style="--value:<%= weekly_progress %>;" role="progressbar">
+          <div class="radial-progress text-accent text-xs sm:text-sm" style="--value:<%= weekly_progress %>; --size:3rem;" role="progressbar">
             <%= weekly_progress %>%
           </div>
         </div>
-        <div class="stat-title">Weekly Progress</div>
-        <div class="stat-value text-accent">
+        <div class="stat-title text-sm">Weekly Progress</div>
+        <div class="stat-value text-accent text-2xl sm:text-3xl">
           <%= weekly_progress %>%
         </div>
-        <div class="stat-desc">Completion rate</div>
+        <div class="stat-desc text-xs">Completion rate</div>
       </div>
     </div>
 
@@ -118,20 +118,20 @@
           .each_with_index do |(day, exercises), index| %>
 
         <div class="card bg-base-100 shadow-xl border-l-4 border-l-primary" data-day="<%= day.downcase %>">
-          <div class="card-body">
+          <div class="card-body p-4 sm:p-6">
             <!-- Day Header -->
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div class="flex items-center gap-4">
                 <div>
-                  <h2 class="text-2xl font-bold text-primary"><%= day.capitalize %></h2>
-                  <p class="text-base-content/70"><%= exercises.count %> exercises planned</p>
+                  <h2 class="text-xl sm:text-2xl font-bold text-primary"><%= day.capitalize %></h2>
+                  <p class="text-sm text-base-content/70"><%= exercises.count %> exercises planned</p>
                 </div>
               </div>
               
               <!-- Day Progress -->
-              <div class="text-right">
+              <div class="text-left sm:text-right">
                 <% completed_today = exercises.select { |wpe| wpe.exercise.exercise_trackings.where(performed_at: Date.current.beginning_of_day..Date.current.end_of_day).any? }.count %>
-                <div class="radial-progress text-primary text-sm" style="--value:<%= exercises.count > 0 ? (completed_today.to_f / exercises.count * 100).round : 0 %>;" role="progressbar">
+                <div class="radial-progress text-primary text-sm" style="--value:<%= exercises.count > 0 ? (completed_today.to_f / exercises.count * 100).round : 0 %>; --size:3rem;" role="progressbar">
                   <%= exercises.count > 0 ? (completed_today.to_f / exercises.count * 100).round : 0 %>%
                 </div>
                 <p class="text-xs text-base-content/70 mt-1"><%= completed_today %>/<%= exercises.count %> done</p>
@@ -139,7 +139,7 @@
             </div>
 
             <!-- Exercises Grid -->
-            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 overflow-visible">
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 overflow-visible">
               <% exercises.sort_by(&:order).each do |workout_plan_exercise| %>
                 <turbo-frame id="exercise_<%= workout_plan_exercise.exercise.id %>">
                   <%= render partial: "exercise", locals: { exercise: workout_plan_exercise.exercise, workout_plan: @workout_plan } %>
@@ -151,13 +151,13 @@
       <% end %>
       
       <% if @workout_plan_exercises.empty? %>
-        <div class="hero min-h-[400px]">
-          <div class="hero-content text-center">
+        <div class="hero min-h-[300px] sm:min-h-[400px]">
+          <div class="hero-content text-center px-4">
             <div class="max-w-md">
-
-              <h1 class="text-3xl font-bold">No Exercises Yet</h1>
-              <p class="py-6">Start building your workout plan by adding some exercises!</p>
-              <%= link_to "Add Exercise", new_workout_plan_exercise_path(@workout_plan), class: "btn btn-primary btn-lg" %>
+              <div class="text-6xl sm:text-8xl mb-4">💪</div>
+              <h1 class="text-2xl sm:text-3xl font-bold">No Exercises Yet</h1>
+              <p class="py-4 sm:py-6 text-sm sm:text-base">Start building your workout plan by adding some exercises!</p>
+              <%= link_to "Add Exercise", new_workout_plan_exercise_path(@workout_plan), class: "btn btn-primary btn-lg w-full sm:w-auto" %>
             </div>
           </div>
         </div>
@@ -183,7 +183,7 @@
 
   <!-- Floating Action Button -->
   <%= link_to new_workout_plan_exercise_path(@workout_plan), 
-      class: "fab btn btn-primary btn-circle btn-lg shadow-lg hover:shadow-xl transition-all duration-300",
+      class: "fixed bottom-20 right-4 z-40 btn btn-primary btn-circle btn-lg shadow-lg hover:shadow-xl transition-all duration-300",
       title: "Add New Exercise" do %>
     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
