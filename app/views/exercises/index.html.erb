@@ -139,11 +139,13 @@
             </div>
 
             <!-- Exercises Grid -->
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 overflow-visible">
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 w-full">
               <% exercises.sort_by(&:order).each do |workout_plan_exercise| %>
-                <turbo-frame id="exercise_<%= workout_plan_exercise.exercise.id %>">
-                  <%= render partial: "exercise", locals: { exercise: workout_plan_exercise.exercise, workout_plan: @workout_plan } %>
-                </turbo-frame>
+                <div class="w-full min-w-0">
+                  <turbo-frame id="exercise_<%= workout_plan_exercise.exercise.id %>" class="block w-full">
+                    <%= render partial: "exercise", locals: { exercise: workout_plan_exercise.exercise, workout_plan: @workout_plan } %>
+                  </turbo-frame>
+                </div>
               <% end %>
             </div>
           </div>
