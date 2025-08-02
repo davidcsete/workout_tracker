@@ -1,10 +1,26 @@
 class WorkoutPlansController < ApplicationController
   before_action :authenticate_user!
   before_action :set_workout_plan, only: %i[ show edit update destroy ]
+  before_action :set_any_workout_plan, only: %i[ duplicate ]
 
   # GET /workout_plans or /workout_plans.json
   def index
-    @workout_plans = WorkoutPlan.all.order(Arel.sql("CASE WHEN user_id = #{current_user.id} THEN 0 ELSE 1 END")).uniq
+    @workout_plans = WorkoutPlan.includes(:user, :exercises, exercises: :exercise_trackings)
+                                .order(Arel.sql("CASE WHEN user_id = #{current_user.id} THEN 0 ELSE 1 END"))
+                                .uniq
+
+    # Quick stats for dashboard
+    @stats = {
+      total_plans: current_user.workout_plans.count,
+      total_exercises: current_user.workout_plans.joins(:exercises).count,
+      workouts_this_week: current_user.workout_plans
+                                     .joins(exercises: :exercise_trackings)
+                                     .where(exercise_trackings: {
+                                       performed_at: 1.week.ago.beginning_of_day..Time.current
+                                     })
+                                     .distinct
+                                     .count
+    }
   end
 
   # GET /workout_plans/1 or /workout_plans/1.json
@@ -51,6 +67,30 @@ class WorkoutPlansController < ApplicationController
     end
   end
 
+  # POST /workout_plans/1/duplicate
+  def duplicate
+    original_plan = WorkoutPlan.find(params[:id])
+
+    @workout_plan = current_user.workout_plans.build(
+      name: "#{original_plan.name} (Copy)"
+    )
+
+    if @workout_plan.save
+      # Copy exercises and their associations
+      original_plan.workout_plan_exercises.each do |wpe|
+        @workout_plan.workout_plan_exercises.create!(
+          exercise: wpe.exercise,
+          day_of_the_week: wpe.day_of_the_week,
+          order: wpe.order
+        )
+      end
+
+      redirect_to workout_plans_path, notice: "Workout plan copied successfully!"
+    else
+      redirect_to workout_plans_path, alert: "Failed to copy workout plan."
+    end
+  end
+
   # DELETE /workout_plans/1 or /workout_plans/1.json
   def destroy
     @workout_plan.destroy!
@@ -65,6 +105,10 @@ class WorkoutPlansController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_workout_plan
       @workout_plan = current_user.workout_plans.find(params.expect(:id))
+    end
+
+    def set_any_workout_plan
+      @workout_plan = WorkoutPlan.find(params.expect(:id))
     end
 
     # Only allow a list of trusted parameters through.

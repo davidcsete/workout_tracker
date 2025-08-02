@@ -1,16 +1,153 @@
 <!-- app/views/workout_plans/index.html.erb -->
-<div class="grid text-center w-full">
-  <h1 class="w-full">Your Workout Plans</h1>
+<div class="container mx-auto p-4" data-controller="workout-plans">
+  <!-- Header Section -->
+  <div class="hero bg-base-200 rounded-box mb-8">
+    <div class="hero-content text-center">
+      <div class="max-w-md">
+        <h1 class="text-5xl font-bold">Workout Plans</h1>
+        <p class="py-6">Manage and track your fitness routines</p>
+        <%= link_to new_workout_plan_path, class: "btn btn-primary btn-lg gap-2" do %>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Create New Plan
+        <% end %>
+      </div>
+    </div>
+  </div>
 
-  <%= link_to "Add New Plan", new_workout_plan_path, class: "btn btn-primary w-full" %>
-
-  <%= turbo_frame_tag "workout_plans", class: "w-full text-center" do %>
-    <div class="workout-plans">
-      <% @workout_plans.each do |plan| %>
-        <%= render partial: 'workout_plans/workout_plan', locals: { workout_plan: plan } %>
-      <% end %>    
+  <!-- Quick Stats -->
+  <% if @stats[:total_plans] > 0 %>
+    <div class="stats shadow mb-8 w-full">
+      <div class="stat">
+        <div class="stat-figure text-primary">
+          <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div class="stat-title">Your Plans</div>
+        <div class="stat-value text-primary"><%= @stats[:total_plans] %></div>
+        <div class="stat-desc">Active workout plans</div>
+      </div>
+      
+      <div class="stat">
+        <div class="stat-figure text-secondary">
+          <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="stat-title">Total Exercises</div>
+        <div class="stat-value text-secondary"><%= @stats[:total_exercises] %></div>
+        <div class="stat-desc">Across all your plans</div>
+      </div>
+      
+      <div class="stat">
+        <div class="stat-figure text-accent">
+          <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="stat-title">This Week</div>
+        <div class="stat-value text-accent"><%= @stats[:workouts_this_week] %></div>
+        <div class="stat-desc">Workouts completed</div>
+      </div>
     </div>
   <% end %>
-  <br/>
-  <br/>
+
+  <!-- Search and Filter Section -->
+  <div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body">
+      <div class="flex flex-col lg:flex-row gap-4">
+        <div class="form-control flex-1">
+          <label class="label">
+            <span class="label-text">Search Plans</span>
+          </label>
+          <input type="text" 
+                 placeholder="Search workout plans..." 
+                 class="input input-bordered w-full" 
+                 data-workout-plans-target="searchInput"
+                 data-action="input->workout-plans#search">
+        </div>
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Filter</span>
+          </label>
+          <div class="join">
+            <button class="btn btn-outline join-item" 
+                    data-filter="my-plans" 
+                    data-workout-plans-target="filterButton"
+                    data-action="click->workout-plans#filter">My Plans</button>
+            <button class="btn btn-outline join-item" 
+                    data-filter="all-plans" 
+                    data-workout-plans-target="filterButton"
+                    data-action="click->workout-plans#filter">All Plans</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%= turbo_frame_tag "workout_plans", class: "w-full" do %>
+    <!-- My Plans Section -->
+    <% my_plans = @workout_plans.select { |plan| plan.user == current_user } %>
+    <% if my_plans.any? %>
+      <div class="mb-8" data-section="my-plans" data-workout-plans-target="section">
+        <div class="divider">
+          <h2 class="text-2xl font-bold flex items-center gap-2">
+            <svg class="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            My Workout Plans
+          </h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <% my_plans.each do |plan| %>
+            <%= render partial: 'workout_plans/workout_plan', locals: { workout_plan: plan, is_owner: true } %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Community Plans Section -->
+    <% community_plans = @workout_plans.select { |plan| plan.user != current_user } %>
+    <% if community_plans.any? %>
+      <div data-section="community-plans" data-workout-plans-target="section">
+        <div class="divider">
+          <h2 class="text-2xl font-bold flex items-center gap-2">
+            <svg class="w-6 h-6 text-secondary" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
+            </svg>
+            Community Plans
+          </h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <% community_plans.each do |plan| %>
+            <%= render partial: 'workout_plans/workout_plan', locals: { workout_plan: plan, is_owner: false } %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @workout_plans.empty? %>
+      <div class="hero bg-base-200 rounded-box">
+        <div class="hero-content text-center">
+          <div class="max-w-md">
+            <div class="text-9xl mb-4">💪</div>
+            <h1 class="text-3xl font-bold">No workout plans yet</h1>
+            <p class="py-6">Get started by creating your first workout plan and begin your fitness journey!</p>
+            <%= link_to "Create Your First Plan", new_workout_plan_path, class: "btn btn-primary btn-lg" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+  <!-- Mobile Floating Action Button -->
+  <div class="btm-nav btm-nav-lg lg:hidden">
+    <%= link_to new_workout_plan_path, class: "btn btn-primary btn-circle btn-lg" do %>
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+    <% end %>
+  </div>
 </div>
