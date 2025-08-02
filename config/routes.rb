@@ -24,6 +24,9 @@ Rails.application.routes.draw do
     registrations: "users/registrations"
   }
   resources :workout_plans do
+    member do
+      post :duplicate
+    end
     resources :exercises, only: [ :index, :new, :create ] do
       resources :exercise_trackings, only: [ :new, :create ]
     end

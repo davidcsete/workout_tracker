@@ -1,17 +1,48 @@
 <!-- app/views/workout_plans/new.html.erb -->
-<h1>Create New Workout Plan</h1>
-
-<%= form_with model: @workout_plan, data: { turbo: false } do |form| %>
-  <br>
-  <div>
-    <label class="input"> 
-      <span class="label">Name</span>
-      <%= form.text_field :name %>
-    </label>
-    
+<div class="container mx-auto p-4">
+  <div class="breadcrumbs text-sm mb-8">
+    <ul>
+      <li><%= link_to "Workout Plans", workout_plans_path, class: "link link-hover" %></li>
+      <li>Create New Plan</li>
+    </ul>
   </div>
 
-  <div>
-    <%= form.submit "Create Plan", class:"btn btn-primary mt-2" %>
+  <%= render "form", workout_plan: @workout_plan %>
+
+  <!-- Quick Start Tips -->
+  <div class="mt-8">
+    <div class="card bg-base-200 shadow-xl">
+      <div class="card-body">
+        <h3 class="card-title text-xl mb-4">
+          <div class="badge badge-info badge-lg">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          Quick Start Tips
+        </h3>
+        
+        <div class="steps steps-vertical lg:steps-horizontal w-full">
+          <div class="step step-primary">
+            <div class="text-left">
+              <h4 class="font-bold">Choose a descriptive name</h4>
+              <p class="text-sm opacity-70">Use names like "Upper Body Strength" or "Morning Cardio" to easily identify your plan</p>
+            </div>
+          </div>
+          <div class="step step-primary">
+            <div class="text-left">
+              <h4 class="font-bold">Add exercises next</h4>
+              <p class="text-sm opacity-70">After creating your plan, you'll be able to add exercises and organize them by day</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="text-left">
+              <h4 class="font-bold">Start tracking</h4>
+              <p class="text-sm opacity-70">Begin logging your workouts and track your progress over time</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-<% end %>
+</div>
