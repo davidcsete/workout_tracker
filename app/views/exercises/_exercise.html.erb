@@ -1,19 +1,130 @@
-<li class="border border-gray-700 p-4 rounded-xl shadow mb-2">
-  <h2 class="text-lg font-semibold"><%= exercise.name %></h2>
+<div class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 border border-base-300 hover:border-primary/30"
+     data-exercise-id="<%= exercise.id %>"
+     data-workout-exercises-target="exerciseCard"
+     draggable="true"
+     data-action="dragstart->workout-exercises#startDrag dragend->workout-exercises#endDrag"
+     ondragover="event.preventDefault()"
+     data-action="drop->workout-exercises#drop">
+  <div class="card-body p-4">
+    <!-- Exercise Header -->
+    <div class="flex items-start justify-between mb-3">
+      <div class="flex items-center gap-3">
+        <div>
+          <h3 class="font-bold text-base leading-tight"><%= exercise.name %></h3>
+          <% latest_tracking = exercise.exercise_trackings.order(created_at: :desc).first %>
+          <% if latest_tracking %>
+            <div class="badge badge-success badge-xs mt-1">Last: <%= latest_tracking.performed_at&.strftime("%m/%d") %></div>
+          <% else %>
+            <div class="badge badge-ghost badge-xs mt-1">Not tracked yet</div>
+          <% end %>
+        </div>
+      </div>
+      
+      <!-- Quick Stats -->
+      <div class="text-right">
+        <% total_sessions = exercise.exercise_trackings.count %>
+        <div class="text-xs text-base-content/70"><%= total_sessions %> sessions</div>
+        <% if latest_tracking %>
+          <div class="text-xs font-semibold text-primary"><%= latest_tracking.weight %>kg × <%= latest_tracking.reps %></div>
+        <% end %>
+      </div>
+    </div>
 
-  <p class="truncate text-sm text-gray-400 mt-1 mb-3">
-    <%= exercise.description %>
-  </p>
+    <!-- Description -->
+    <% if exercise.description.present? %>
+      <p class="text-sm text-base-content/70 mb-3 line-clamp-2">
+        <%= exercise.description %>
+      </p>
+    <% end %>
 
-  <% latest_tracking = exercise.exercise_trackings.order(created_at: :desc).first %>
-  <% if latest_tracking %>
-    <p class="text-sm text-gray-400 mb-3">
-      Last tracked: <%= latest_tracking.reps %> reps with <%= latest_tracking.weight %>kg
-      @ <%= latest_tracking.performed_at&.strftime("%Y-%m-%d %H:%M") %>
-    </p>
-  <% end %>
+    <!-- Progress Indicator -->
+    <% if latest_tracking %>
+      <div class="mb-3">
+        <div class="flex justify-between text-xs text-base-content/70 mb-1">
+          <span>Recent Progress</span>
+          <span><%= latest_tracking.performed_at ? "#{time_ago_in_words(latest_tracking.performed_at)} ago" : "No date recorded" %></span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="flex-1 bg-base-200 rounded-full h-2">
+            <% progress_percentage = [((latest_tracking.weight || 0) / 100.0 * 100), 100].min %>
+            <div class="bg-gradient-to-r from-primary to-secondary h-2 rounded-full transition-all duration-500" 
+                 style="width: <%= progress_percentage %>%"></div>
+          </div>
+          <span class="text-xs font-semibold text-primary"><%= latest_tracking.weight || 0 %>kg</span>
+        </div>
+      </div>
+    <% end %>
 
-  <% unless params[:action] == "edit" %>
-    <%= link_to "Track this exercise", new_workout_plan_exercise_exercise_tracking_path(workout_plan, exercise), data: { turbo_frame: "_top" }, class: "btn btn-primary w-full sm:w-auto" %>
-  <% end %>
-</li>
+    <!-- Action Buttons -->
+    <div class="card-actions justify-between items-center mt-4">
+      <% unless params[:action] == "edit" %>
+        <!-- Quick Track Button -->
+        <%= link_to new_workout_plan_exercise_exercise_tracking_path(workout_plan, exercise), 
+            data: { 
+              turbo_frame: "_top",
+              action: "click->workout-exercises#quickTrack",
+              workout_exercises_exercise_id_param: exercise.id
+            }, 
+            class: "btn btn-primary btn-sm flex-1 mr-2" do %>
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Track
+        <% end %>
+        
+        <!-- More Options Dropdown -->
+        <div class="dropdown dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+            </svg>
+          </div>
+          <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow-lg border border-base-300">
+            <li>
+              <a href="#" class="text-sm" 
+                 data-action="click->workout-exercises#showDetails"
+                 data-workout-exercises-exercise-id-param="<%= exercise.id %>">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+                View Details
+              </a>
+            </li>
+            <li>
+              <%= link_to edit_exercise_path(exercise), class: "text-sm" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                Edit Exercise
+              <% end %>
+            </li>
+            <% if exercise.exercise_trackings.any? %>
+              <li>
+                <a href="#" class="text-sm">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                  </svg>
+                  View History
+                </a>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Completion Status -->
+    <% completed_today = exercise.exercise_trackings.where(performed_at: Date.current.beginning_of_day..Date.current.end_of_day).any? %>
+    <% if completed_today %>
+      <div class="absolute top-2 right-2">
+        <div class="badge badge-success badge-sm">
+          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          Done Today
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
