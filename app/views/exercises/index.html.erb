@@ -95,13 +95,14 @@
       
       <div class="stat">
         <div class="stat-figure text-accent">
-          <div class="radial-progress text-accent" style="--value:<%= (@workout_plan_exercises.joins(exercise: :exercise_trackings).where(exercise_trackings: { performed_at: 1.week.ago.beginning_of_day..Time.current }).distinct.count.to_f / @workout_plan_exercises.count * 100).round %>;" role="progressbar">
-            <%= (@workout_plan_exercises.joins(exercise: :exercise_trackings).where(exercise_trackings: { performed_at: 1.week.ago.beginning_of_day..Time.current }).distinct.count.to_f / @workout_plan_exercises.count * 100).round %>%
+          <% weekly_progress = @workout_plan_exercises.count > 0 ? (@workout_plan_exercises.joins(exercise: :exercise_trackings).where(exercise_trackings: { performed_at: 1.week.ago.beginning_of_day..Time.current }).distinct.count.to_f / @workout_plan_exercises.count * 100).round : 0 %>
+          <div class="radial-progress text-accent" style="--value:<%= weekly_progress %>;" role="progressbar">
+            <%= weekly_progress %>%
           </div>
         </div>
         <div class="stat-title">Weekly Progress</div>
         <div class="stat-value text-accent">
-          <%= (@workout_plan_exercises.joins(exercise: :exercise_trackings).where(exercise_trackings: { performed_at: 1.week.ago.beginning_of_day..Time.current }).distinct.count.to_f / @workout_plan_exercises.count * 100).round %>%
+          <%= weekly_progress %>%
         </div>
         <div class="stat-desc">Completion rate</div>
       </div>
