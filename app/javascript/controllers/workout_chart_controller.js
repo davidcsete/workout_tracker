@@ -6,6 +6,8 @@ export default class WorkoutChartController extends Controller {
     url: String
   }
 
+  chart = null
+
 
   async fetchData() {    
     try {
@@ -33,7 +35,12 @@ export default class WorkoutChartController extends Controller {
 
     const ctx = document.getElementById('myChart');
 
-    new Chart(ctx, {
+    // Destroy existing chart if it exists
+    if (this.chart) {
+      this.chart.destroy();
+    }
+
+    this.chart = new Chart(ctx, {
       type: "bar",
       data: {
         labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
@@ -55,5 +62,12 @@ export default class WorkoutChartController extends Controller {
       },
     });
 
+  }
+
+  disconnect() {
+    if (this.chart) {
+      this.chart.destroy();
+      this.chart = null;
+    }
   }
 }
