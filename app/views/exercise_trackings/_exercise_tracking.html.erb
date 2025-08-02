@@ -1,14 +1,34 @@
-<div id="<%= dom_id exercise_tracking %>" class="w-full sm:w-auto my-5 space-y-5">
-  <div class="flex flex-row items-center justify-center gap-3">
-    <div>
-      <strong class="block font-medium mb-1">Reps:</strong>
-      <%= exercise_tracking.reps %>
+<div id="<%= dom_id exercise_tracking %>" class="card bg-base-100 shadow-lg border-l-4 border-l-primary mb-4 max-w-md mx-auto">
+  <div class="card-body p-4">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-4">
+      <div class="badge badge-primary badge-lg">
+        Set <%= defined?(set_number) ? set_number : "1" %>
+      </div>
+      <div class="text-xs text-base-content/60">
+        <%= time_ago_in_words(exercise_tracking.created_at) %> ago
+      </div>
     </div>
-    <div>
-      <strong class="block font-medium mb-1">Weight:</strong>
-      <%= exercise_tracking.weight %>
+    
+    <!-- Stats -->
+    <div class="stats stats-horizontal shadow w-full">
+      <div class="stat place-items-center">
+        <div class="stat-title text-xs">Reps</div>
+        <div class="stat-value text-2xl text-primary"><%= exercise_tracking.reps %></div>
+      </div>
+      
+      <div class="stat place-items-center">
+        <div class="stat-title text-xs">Weight</div>
+        <div class="stat-value text-2xl text-secondary"><%= exercise_tracking.weight %></div>
+        <div class="stat-desc text-xs">kg</div>
+      </div>
+    </div>
+    
+    <!-- Total -->
+    <div class="text-center mt-3">
+      <div class="badge badge-success">
+        Total: <%= (exercise_tracking.reps * exercise_tracking.weight.to_f).round(1) %> kg
+      </div>
     </div>
   </div>
-  <hr>
-  <br/>
 </div>

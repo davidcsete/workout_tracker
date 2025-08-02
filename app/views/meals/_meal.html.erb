@@ -1,40 +1,120 @@
-<div class="bg-base-100 text-base-content shadow-md border border-base-300 rounded-xl p-4 mb-6">
-    <div class="flex justify-between items-center">
-      <h2 class="text-xl font-semibold"><%= meal.meal_type.titleize %></h2>
-      <%= link_to "Add Food", new_meal_food_item_path(meal, date: @date), 
-          class: "btn btn-sm btn-accent", 
-          data: { turbo_frame: "_top" } %>
+<div class="card bg-base-100 shadow-xl border-l-4 border-l-primary mb-6">
+  <div class="card-body">
+    <!-- Meal Header -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="flex items-center gap-3">
+        <div class="avatar placeholder">
+          <div class="bg-primary text-primary-content rounded-lg w-12 h-12 flex items-center justify-center text-center">
+            <div class="text-lg leading-none flex items-center justify-center w-full h-full"><%=
+              case meal.meal_type.downcase
+              when 'breakfast' then '🍳'
+              when 'lunch' then '🥗'
+              when 'dinner' then '🍽️'
+              when 'snack' then '🍎'
+              else '🍴'
+              end
+            %></div>
+          </div>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold"><%= meal.meal_type.titleize %></h2>
+          <p class="text-sm text-base-content/70"><%= meal.food_items.count %> items</p>
+        </div>
+      </div>
+      
+      <%= link_to new_meal_food_item_path(meal, date: @date), 
+          class: "btn btn-primary btn-sm gap-2", 
+          data: { turbo_frame: "_top" } do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+        Add Food
+      <% end %>
     </div>
 
-    <ul class="mt-4 divide-y divide-base-300">
-      <% if meal.food_items.empty? %>
-        <li class="text-sm text-neutral-content">No food items added yet.</li>
-      <% else %>
+    <!-- Food Items -->
+    <% if meal.food_items.empty? %>
+      <div class="text-center py-8 bg-base-200 rounded-lg">
+        <p class="text-base-content/70 mb-4">No food items added yet</p>
+        <%= link_to new_meal_food_item_path(meal, date: @date), 
+            class: "btn btn-primary btn-sm", 
+            data: { turbo_frame: "_top" } do %>
+          Add First Item
+        <% end %>
+      </div>
+    <% else %>
+      <div class="space-y-3">
         <% meal.food_items.each do |item| %>
-          <li id="<%= dom_id(item) %>" class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 py-2 transition-all duration-300 ease-in-out">
-            <div class="flex-1">
-              <strong><%= item.name %></strong> – <%= item.grams %>g
-              <div class="text-sm">
-                <%= item.calories %> kcal |
-                <%= item.protein %>g P |
-                <%= item.carbs %>g C |
-                <%= item.fats %>g F
+          <div id="<%= dom_id(item) %>" class="card bg-base-200 shadow-sm">
+            <div class="card-body p-4">
+              <div class="flex justify-between items-start">
+                <div class="flex-1">
+                  <h3 class="font-semibold text-lg"><%= item.name %></h3>
+                  <p class="text-sm text-base-content/70 mb-2"><%= item.grams %>g serving</p>
+                  
+                  <!-- Nutrition Info -->
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
+                    <div class="badge badge-primary badge-outline">
+                      <%= item.calories %> kcal
+                    </div>
+                    <div class="badge badge-secondary badge-outline">
+                      <%= item.protein %>g P
+                    </div>
+                    <div class="badge badge-accent badge-outline">
+                      <%= item.carbs %>g C
+                    </div>
+                    <div class="badge badge-warning badge-outline">
+                      <%= item.fats %>g F
+                    </div>
+                  </div>
+                </div>
+                
+                <%= button_to meal_food_item_path(meal, item), 
+                    method: :delete, 
+                    data: { turbo_confirm: "Remove #{item.name} from this meal?" },
+                    class: "btn btn-ghost btn-sm btn-circle text-error hover:bg-error hover:text-error-content" do %>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                <% end %>
               </div>
             </div>
-            <%= button_to meal_food_item_path(meal, item), method: :delete, data: { turbo_confirm: "Are you sure?" },
-                  class: "btn btn-sm btn-outline btn-error" do %>
-              Delete
-            <% end %>
-          </li>
+          </div>
         <% end %>
-      <% end %>
-    </ul>
+      </div>
 
-    <div id="<%= dom_id(meal, :totals) %>" class="mt-4 font-medium text-right">
-      <% total_cals = meal.food_items.sum { |item| item.calories.to_f } %>
-      <% total_protein = meal.food_items.sum { |item| item.protein.to_f } %>
-      <% total_carbs = meal.food_items.sum { |item| item.carbs.to_f } %>
-      <% total_fat = meal.food_items.sum { |item| item.fats.to_f } %>
-      <span>Total: <%= total_cals %> kcal — <%= total_protein %>g P, <%= total_carbs %>g C, <%= total_fat %>g F</span>
-    </div>
+      <!-- Meal Totals -->
+      <div id="<%= dom_id(meal, :totals) %>" class="divider"></div>
+      <div class="stats stats-horizontal shadow w-full">
+        <% total_cals = meal.food_items.sum { |item| item.calories.to_f } %>
+        <% total_protein = meal.food_items.sum { |item| item.protein.to_f } %>
+        <% total_carbs = meal.food_items.sum { |item| item.carbs.to_f } %>
+        <% total_fat = meal.food_items.sum { |item| item.fats.to_f } %>
+        
+        <div class="stat place-items-center">
+          <div class="stat-title text-xs">Total Calories</div>
+          <div class="stat-value text-lg text-primary"><%= total_cals.to_i %></div>
+          <div class="stat-desc">kcal</div>
+        </div>
+        
+        <div class="stat place-items-center">
+          <div class="stat-title text-xs">Protein</div>
+          <div class="stat-value text-lg text-secondary"><%= total_protein.round(1) %></div>
+          <div class="stat-desc">grams</div>
+        </div>
+        
+        <div class="stat place-items-center">
+          <div class="stat-title text-xs">Carbs</div>
+          <div class="stat-value text-lg text-accent"><%= total_carbs.round(1) %></div>
+          <div class="stat-desc">grams</div>
+        </div>
+        
+        <div class="stat place-items-center">
+          <div class="stat-title text-xs">Fats</div>
+          <div class="stat-value text-lg text-warning"><%= total_fat.round(1) %></div>
+          <div class="stat-desc">grams</div>
+        </div>
+      </div>
+    <% end %>
   </div>
+</div>

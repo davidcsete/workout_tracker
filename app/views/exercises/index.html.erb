@@ -138,7 +138,7 @@
             </div>
 
             <!-- Exercises Grid -->
-            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 overflow-visible">
               <% exercises.sort_by(&:order).each do |workout_plan_exercise| %>
                 <turbo-frame id="exercise_<%= workout_plan_exercise.exercise.id %>">
                   <%= render partial: "exercise", locals: { exercise: workout_plan_exercise.exercise, workout_plan: @workout_plan } %>

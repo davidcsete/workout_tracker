@@ -1,24 +1,70 @@
-<div data-controller="meal-date" class="max-w-4xl mx-auto px-4 py-8">
+<div class="min-h-screen bg-gradient-to-br from-base-100 to-base-200">
+  <div data-controller="meal-date" class="container mx-auto px-4 py-6 max-w-6xl">
+    
+    <!-- Header Section -->
+    <div class="hero bg-gradient-to-r from-accent to-secondary text-accent-content rounded-2xl mb-8">
+      <div class="hero-content text-center py-8">
+        <div>
+          <!-- Date Navigation -->
+          <div class="flex justify-center items-center mb-4 gap-4">
+            <button data-action="click->meal-date#prev" class="btn btn-ghost btn-circle btn-sm">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
 
-  <div class="flex justify-center items-center mb-6 gap-4 text-2xl font-bold text-base-content">
-    <button data-action="click->meal-date#prev" class="btn btn-ghost btn-sm">←</button>
+            <h1 class="text-3xl font-bold" data-meal-date-target="dateDisplay">
+              <%= @date.strftime("%B %-d, %Y") %>
+            </h1>
 
-    <h1 class="text-center" data-meal-date-target="dateDisplay">
-      <%= @date.strftime("%B %-d, %Y") %>
-    </h1>
+            <button data-action="click->meal-date#next" class="btn btn-ghost btn-circle btn-sm">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <p class="text-lg opacity-90">Track your daily nutrition</p>
+          
+          <!-- Quick Add Button -->
+          <%= link_to new_meal_path(date: @date), 
+              class: "btn btn-primary btn-lg gap-2 mt-4", 
+              data: { 
+                turbo_frame: "_top", 
+                meal_date_target: "dateLink" 
+              } do %>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Add Meal
+          <% end %>
+        </div>
+      </div>
+    </div>
 
-    <button data-action="click->meal-date#next" class="btn btn-ghost btn-sm">→</button>
+    <!-- Daily Totals -->
+    <%= render partial: "daily_totals", locals: { date: @date } %>
+    
+    <!-- Meals Section -->
+    <div class="space-y-6">
+      <%= render partial: "daily_meals", locals: { meals: @meals } %>
+      
+      <!-- Empty State -->
+      <% if @meals.empty? %>
+        <div class="hero min-h-[300px]">
+          <div class="hero-content text-center">
+            <div class="max-w-md">
+              <h2 class="text-2xl font-bold mb-4">No meals logged today</h2>
+              <p class="text-base-content/70 mb-6">Start tracking your nutrition by adding your first meal!</p>
+              <%= link_to new_meal_path(date: @date), 
+                  class: "btn btn-primary btn-lg", 
+                  data: { turbo_frame: "_top" } do %>
+                Add Your First Meal
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
   </div>
-
-  <%= link_to "Add a Meal", new_meal_path(date: @date), 
-    class: "btn btn-primary mb-6 inline-block", 
-    data: { 
-      turbo_frame: "_top", 
-      meal_date_target: "dateLink" 
-    } %>
-
-  <%= render partial: "daily_totals", locals: { date: @date } %>
-  
-  <%= render partial: "daily_meals", locals: { meals: @meals } %>
-
 </div>

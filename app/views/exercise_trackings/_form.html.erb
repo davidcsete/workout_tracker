@@ -1,54 +1,108 @@
-<%= form_with(model: exercise_tracking, turbo_stream: true, class: "space-y-6 mb-2") do |form| %>
+<%= form_with(model: exercise_tracking, turbo_stream: true, class: "space-y-6") do |form| %>
   <% if exercise_tracking.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 border border-red-300 text-red-600 px-4 py-3 rounded-md">
-      <h2 class="font-semibold mb-2">
-        <%= pluralize(exercise_tracking.errors.count, "error") %> prohibited this entry:
-      </h2>
-      <ul class="list-disc ml-6 space-y-1">
-        <% exercise_tracking.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <h3 class="font-bold">Error!</h3>
+        <div class="text-xs">
+          <% exercise_tracking.errors.each do |error| %>
+            <div><%= error.full_message %></div>
+          <% end %>
+        </div>
+      </div>
     </div>
   <% end %>
 
-  <%# Hidden workout_plan_id %>
+  <%# Hidden fields %>
   <% if @workout_plan %>
     <%= form.hidden_field :workout_plan_id, value: @workout_plan.id %>
   <% end %>
-
-  <%# Hidden date field %>
+  
   <% if defined?(date) && date %>
     <%= hidden_field_tag :date, date.strftime("%Y-%m-%d"), data: { exercise_date_target: "dateInput" } %>
   <% end %>
+  
+  <%= form.hidden_field :exercise_id, value: @exercise.id %>
 
-  <%# Hidden exercise_id + display name %>
-  <div>
-    <%= form.hidden_field :exercise_id, value: @exercise.id %>
-    <h3 class="text-lg font-semibold mb-1"><%= @exercise.name %></h3>
-    <hr class="border-gray-300">
+  <!-- Input Fields Grid -->
+  <div class="grid md:grid-cols-2 gap-6">
+    <!-- Reps Input -->
+    <div class="form-control">
+      <%= form.label :reps, class: "label" do %>
+        <span class="label-text text-lg font-semibold">
+          Repetitions
+        </span>
+      <% end %>
+      <div class="input-group">
+        <%= form.number_field :reps, 
+            class: ["input input-bordered input-lg text-center text-2xl font-bold", 
+                   {"input-error": exercise_tracking.errors[:reps].any?}],
+            placeholder: "0",
+            min: 0,
+            step: 1 %>
+        <span class="bg-base-200 px-4 flex items-center text-base-content/70 font-medium">reps</span>
+      </div>
+      <% if exercise_tracking.errors[:reps].any? %>
+        <label class="label">
+          <span class="label-text-alt text-error"><%= exercise_tracking.errors[:reps].first %></span>
+        </label>
+      <% end %>
+    </div>
+
+    <!-- Weight Input -->
+    <div class="form-control">
+      <%= form.label :weight, class: "label" do %>
+        <span class="label-text text-lg font-semibold">
+          Weight
+        </span>
+      <% end %>
+      <div class="input-group">
+        <%= form.number_field :weight, 
+            class: ["input input-bordered input-lg text-center text-2xl font-bold", 
+                   {"input-error": exercise_tracking.errors[:weight].any?}],
+            placeholder: "0",
+            min: 0,
+            step: 0.5 %>
+        <span class="bg-base-200 px-4 flex items-center text-base-content/70 font-medium">kg</span>
+      </div>
+      <% if exercise_tracking.errors[:weight].any? %>
+        <label class="label">
+          <span class="label-text-alt text-error"><%= exercise_tracking.errors[:weight].first %></span>
+        </label>
+      <% end %>
+    </div>
   </div>
 
-  <%# Reps field %>
-  <div>
-    <%= form.label :reps, class: "block text-sm font-medium text-gray-700 mb-1" %>
-    <%= form.number_field :reps, class: [
-      "w-full rounded-md shadow-sm border px-3 py-2",
-      exercise_tracking.errors[:reps].any? ? "border-red-400 focus:outline-red-600" : "border-gray-300 focus:outline-blue-600"
-    ] %>
+  <!-- Quick Preset Buttons -->
+  <div class="space-y-4">
+    <div class="divider">Quick Actions</div>
+    
+    <!-- Previous Set Button -->
+    <% last_tracking = @exercise.exercise_trackings.where(user: current_user).order(created_at: :desc).first %>
+    <% if last_tracking %>
+      <div class="flex justify-center">
+        <button type="button" 
+                class="btn btn-outline btn-sm gap-2"
+                onclick="document.getElementById('exercise_tracking_reps').value = '<%= last_tracking.reps %>'; document.getElementById('exercise_tracking_weight').value = '<%= last_tracking.weight %>';">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          Use Last Set (<%= last_tracking.reps %> reps × <%= last_tracking.weight %>kg)
+        </button>
+      </div>
+    <% end %>
   </div>
 
-  <%# Weight field %>
-  <div>
-    <%= form.label :weight, class: "block text-sm font-medium text-gray-700 mb-1" %>
-    <%= form.text_field :weight, class: [
-      "w-full rounded-md shadow-sm border px-3 py-2",
-      exercise_tracking.errors[:weight].any? ? "border-red-400 focus:outline-red-600" : "border-gray-300 focus:outline-blue-600"
-    ] %>
-  </div>
-
-  <%# Submit button %>
-  <div class="flex justify-center sm:justify-start">
-    <%= form.submit "Save Tracking", class: "btn btn-primary w-full sm:w-auto" %>
+  <!-- Submit Button -->
+  <div class="form-control mt-8">
+    <%= form.submit "Log This Set", 
+        class: "btn btn-primary btn-lg w-full gap-2 text-lg font-bold" do %>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+      </svg>
+      Log This Set
+    <% end %>
   </div>
 <% end %>

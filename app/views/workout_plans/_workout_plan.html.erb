@@ -1,5 +1,5 @@
 <div id="<%= dom_id(workout_plan) %>" 
-     class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 border-2 border-base-300 hover:border-primary"
+     class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 border-2 border-base-300 hover:border-primary overflow-visible"
      data-plan-name="<%= workout_plan.name %>"
      data-plan-author="<%= workout_plan.user.username %>"
      data-workout-plans-target="planCard">
@@ -103,13 +103,13 @@
       </div>
 
       <% if is_owner %>
-        <div class="dropdown dropdown-end">
+        <div class="dropdown dropdown-end dropdown-top">
           <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
             </svg>
           </div>
-          <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-lg bg-base-100 rounded-box w-52">
+          <ul tabindex="0" class="dropdown-content z-[9999] menu p-2 shadow-lg bg-base-100 rounded-box w-52">
             <li>
               <%= link_to edit_workout_plan_path(workout_plan), data: { turbo_frame: "_top" } do %>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,40 +1,115 @@
-<% content_for :title, "New Exercise Tracking" %>
+<% content_for :title, "Track Exercise" %>
 
-<div data-controller="exercise-date" 
-     data-workout-plan-id="<%= @workout_plan.id %>" 
-     data-exercise-id="<%= @exercise.id %>"
-     class="w-full max-w-xl mx-auto px-4 snap-x lg:px-8 space-y-8 max-h-[90vh] pb-15 mb-15">
-  
-  <div class="flex justify-center items-center mb-6 gap-4 text-2xl font-bold overflow-y-visible text-base-content">
-    <button data-action="click->exercise-date#prev" class="btn btn-ghost btn-sm">←</button>
+<div class="min-h-screen bg-gradient-to-br from-base-100 to-base-200">
+  <div data-controller="exercise-date" 
+       data-workout-plan-id="<%= @workout_plan.id %>" 
+       data-exercise-id="<%= @exercise.id %>"
+       class="container mx-auto px-4 py-6 max-w-4xl">
+    
+    <!-- Header Section -->
+    <div class="hero bg-gradient-to-r from-primary to-secondary text-primary-content rounded-2xl mb-8">
+      <div class="hero-content text-center py-8">
+        <div>
+          <!-- Date Navigation -->
+          <div class="flex justify-center items-center mb-4 gap-4">
+            <button data-action="click->exercise-date#prev" class="btn btn-ghost btn-circle btn-sm">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
 
-    <h1 class="text-center" data-exercise-date-target="dateDisplay">
-      <%= @date.strftime("%B %-d, %Y") %>
-    </h1>
+            <h1 class="text-2xl font-bold" data-exercise-date-target="dateDisplay">
+              <%= @date.strftime("%B %-d, %Y") %>
+            </h1>
 
-    <button data-action="click->exercise-date#next" class="btn btn-ghost btn-sm">→</button>
-  </div>
-  
-  <div class="text-center">
-    <h2 class="font-bold text-xl sm:text-2xl"><%= @exercise.name %></h2>
-  </div>
+            <button data-action="click->exercise-date#next" class="btn btn-ghost btn-circle btn-sm">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <h2 class="text-3xl font-bold mb-2"><%= @exercise.name %></h2>
+          <p class="text-lg opacity-90">Track your workout progress</p>
+        </div>
+      </div>
+    </div>
 
-  <%= render "form", exercise_tracking: @exercise_tracking, exercise: @exercise, date: @date %>
+    <!-- Main Content Grid -->
+    <div class="grid lg:grid-cols-3 gap-8">
+      
+      <!-- Tracking Form -->
+      <div class="lg:col-span-2">
+        <div class="card bg-base-100 shadow-xl">
+          <div class="card-body">
+            <h3 class="card-title text-2xl mb-6">
+              Log Your Set
+            </h3>
+            
+            <%= render "form", exercise_tracking: @exercise_tracking, exercise: @exercise, date: @date %>
+          </div>
+        </div>
+      </div>
 
-  <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 items-center justify-center">
-    <%= link_to "Back to exercises", workout_plan_exercises_path(@workout_plan),
-      class: "btn btn-accent w-full sm:w-auto text-center font-medium" %>
+      <!-- Stats & History Sidebar -->
+      <div class="space-y-6">
+        <!-- Quick Stats -->
+        <div class="card bg-base-100 shadow-xl">
+          <div class="card-body">
+            <h3 class="card-title text-lg mb-4">Today's Progress</h3>
+            <div class="stats stats-vertical shadow">
+              <div class="stat">
+                <div class="stat-title">Sets Completed</div>
+                <div class="stat-value text-primary"><%= @exercise_trackings.count %></div>
+                <div class="stat-desc">This session</div>
+              </div>
+              
+              <% if @exercise_trackings.any? %>
+                <div class="stat">
+                  <div class="stat-title">Total Reps</div>
+                  <div class="stat-value text-secondary"><%= @exercise_trackings.sum(:reps) %></div>
+                  <div class="stat-desc">Today</div>
+                </div>
+                
+                <div class="stat">
+                  <div class="stat-title">Max Weight</div>
+                  <div class="stat-value text-accent"><%= @exercise_trackings.maximum(:weight) || 0 %>kg</div>
+                  <div class="stat-desc">Personal best today</div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
 
-    <%= link_to "To exercise trackings",
-      exercise_trackings_path(workout_plan_id: @workout_plan.id, exercise_id: @exercise.id),
-      class: "btn btn-info w-full sm:w-auto text-center font-medium" %>
-  </div>
+        <!-- Recent History -->
+        <div class="card bg-base-100 shadow-xl">
+          <div class="card-body">
+            <%= turbo_frame_tag "tracking_feed" do %>
+              <%= render partial: "exercise_trackings/feed", locals: {
+                exercise_trackings: @exercise_trackings
+              } %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <div class="w-full">
-    <%= turbo_frame_tag "tracking_feed" do %>
-      <%= render partial: "exercise_trackings/feed", locals: {
-        exercise_trackings: @exercise_trackings
-      } %>
-    <% end %>
+    <!-- Navigation Actions -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+      <%= link_to workout_plan_exercises_path(@workout_plan), class: "btn btn-ghost gap-2" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Back to Exercises
+      <% end %>
+
+      <%= link_to exercise_trackings_path(workout_plan_id: @workout_plan.id, exercise_id: @exercise.id), 
+          class: "btn btn-outline gap-2" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+        </svg>
+        View All History
+      <% end %>
+    </div>
   </div>
 </div>
