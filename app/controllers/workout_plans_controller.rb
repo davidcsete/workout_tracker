@@ -46,7 +46,7 @@ class WorkoutPlansController < ApplicationController
         end
 
         format.turbo_stream do
-          render turbo_stream: turbo_stream.redirect_to(workout_plans_path)
+          redirect_to workout_plans_path, notice: "Workout plan created successfully"
         end
       end
     else

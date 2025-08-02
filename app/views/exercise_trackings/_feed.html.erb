@@ -1,8 +1,22 @@
 <div id="tracking_feed" class="w-full">
-  <h3 class="text-lg font-semibold mb-2">Today's Trackings</h3>
+  <h3 class="card-title text-lg mb-4 flex items-center gap-2">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+    </svg>
+    Today's Sets
+  </h3>
+  
   <% if exercise_trackings.any? %>
-    <%= render exercise_trackings %>
+    <div class="space-y-4">
+      <% exercise_trackings.each_with_index do |exercise_tracking, index| %>
+        <%= render partial: "exercise_trackings/exercise_tracking", 
+            locals: { exercise_tracking: exercise_tracking, set_number: index + 1 } %>
+      <% end %>
+    </div>
   <% else %>
-    <p class="text-sm text-gray-500">No exercises tracked today yet.</p>
+    <div class="text-center py-8">
+      <p class="text-base-content/70 text-lg font-medium mb-2">No sets logged today yet.</p>
+      <p class="text-sm text-base-content/50">Start tracking to see your progress!</p>
+    </div>
   <% end %>
 </div>
