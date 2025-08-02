@@ -11,14 +11,30 @@
     </div>
   <% end %>
 
-  <div class="my-5">
-    <%= form.label :name %>
-    <%= form.text_field :name, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": exercise.errors[:name].none?, "border-red-400 focus:outline-red-600": exercise.errors[:name].any?}] %>
+  <div class="form-control my-5">
+    <%= form.label :name, class: "label" %>
+    <%= form.text_field :name, class: ["input input-bordered w-full", {"input-error": exercise.errors[:name].any?}] %>
   </div>
 
-  <div class="my-5">
-    <%= form.label :description %>
-    <%= form.textarea :description, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": exercise.errors[:description].none?, "border-red-400 focus:outline-red-600": exercise.errors[:description].any?}] %>
+  <div class="form-control my-5">
+    <%= form.label :description, class: "label" %>
+    <%= form.textarea :description, rows: 4, class: ["textarea textarea-bordered w-full", {"textarea-error": exercise.errors[:description].any?}] %>
+  </div>
+
+  <div class="form-control my-5">
+    <%= label_tag :day_of_the_week, "Day of the Week", class: "label" %>
+    <%= select_tag :day_of_the_week, 
+        options_for_select([
+          ['Monday', 'monday'],
+          ['Tuesday', 'tuesday'], 
+          ['Wednesday', 'wednesday'],
+          ['Thursday', 'thursday'],
+          ['Friday', 'friday'],
+          ['Saturday', 'saturday'],
+          ['Sunday', 'sunday']
+        ], params[:day_of_the_week]), 
+        { class: "select select-bordered w-full", 
+          prompt: "Select a day" } %>
   </div>
 
   <div class="inline">

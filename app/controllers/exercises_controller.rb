@@ -23,11 +23,34 @@ class ExercisesController < ApplicationController
   # POST /exercises or /exercises.json
   def create
     @exercise = Exercise.new(exercise_params)
+    day_of_week = params[:day_of_the_week]
+
+    # Validate day_of_the_week is present
+    if day_of_week.blank?
+      @exercise.errors.add(:base, "Day of the week must be selected")
+      respond_to do |format|
+        format.html { render :new, status: :unprocessable_entity }
+        format.json { render json: @exercise.errors, status: :unprocessable_entity }
+      end
+      return
+    end
 
     respond_to do |format|
       if @exercise.save
-        WorkoutPlanExercise.create!(workout_plan: @workout_plan, exercise: @exercise)
-        format.html { redirect_to edit_workout_plan_path(@workout_plan), notice: "Exercise created successfully." }
+        # Get the next order for this day
+        next_order = @workout_plan.workout_plan_exercises
+                                  .where(day_of_the_week: day_of_week)
+                                  .maximum(:order).to_i + 1
+
+        # Create the WorkoutPlanExercise with day and order
+        WorkoutPlanExercise.create!(
+          workout_plan: @workout_plan,
+          exercise: @exercise,
+          day_of_the_week: day_of_week,
+          order: next_order
+        )
+
+        format.html { redirect_to workout_plan_exercises_path(@workout_plan), notice: "Exercise created successfully." }
         format.json { render :show, status: :created, location: @exercise }
       else
         format.html { render :new, status: :unprocessable_entity }

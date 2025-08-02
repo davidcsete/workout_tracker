@@ -1,9 +1,30 @@
 <% content_for :title, "New exercise" %>
 
-<div class="md:w-2/3 w-full">
-  <h1 class="font-bold text-4xl">New exercise</h1>
+<div class="min-h-screen bg-gradient-to-br from-base-100 to-base-200">
+  <div class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-primary mb-2">Add New Exercise</h1>
+        <p class="text-base-content/70">Add a new exercise to <span class="font-semibold text-primary"><%= @workout_plan.name %></span></p>
+      </div>
 
-  <%= render "form", exercise: @exercise %>
+      <!-- Form Card -->
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <%= render "form", exercise: @exercise %>
+        </div>
+      </div>
 
-  <%= link_to "Back to workout plan", edit_workout_plan_path(@workout_plan), class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 btn btn-secondary inline-block font-medium" %>
+      <!-- Navigation -->
+      <div class="text-center mt-6">
+        <%= link_to workout_plan_exercises_path(@workout_plan), class: "btn btn-ghost gap-2" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Back to Exercises
+        <% end %>
+      </div>
+    </div>
+  </div>
 </div>
