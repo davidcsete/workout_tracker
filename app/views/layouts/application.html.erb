@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-persistence" content="enabled">
     <%# <meta name="view-transition" content="same-origin" /> %>
 
     <%= csrf_meta_tags %>
@@ -15,6 +16,17 @@
       (function() {
         const theme = localStorage.getItem('theme') || 'default';
         document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.className = document.documentElement.className
+          .replace(/theme-\w+/g, '') + ' theme-' + theme;
+        
+        // Also apply to body when it's available
+        if (document.body) {
+          document.body.setAttribute('data-theme', theme);
+        } else {
+          document.addEventListener('DOMContentLoaded', function() {
+            document.body.setAttribute('data-theme', theme);
+          });
+        }
       })();
     </script>
 

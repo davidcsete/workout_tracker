@@ -1,69 +1,37 @@
-// Apply theme from localStorage immediately (before DOM loads)
+// Simplified theme handler - works with Stimulus controller
 function applyThemeFromStorage() {
     const theme = localStorage.getItem('theme') || 'default';
     document.documentElement.setAttribute('data-theme', theme);
-    // Also set it on the body as a fallback
+    
     if (document.body) {
         document.body.setAttribute('data-theme', theme);
     }
+    
+    // Add theme class for additional CSS targeting
+    document.documentElement.className = document.documentElement.className
+        .replace(/theme-\w+/g, '') + ` theme-${theme}`;
 }
 
-// Apply theme immediately - run as soon as script loads
+// Apply theme immediately
 applyThemeFromStorage();
 
-// Also apply on script load to catch early execution
+// Handle DOM ready state
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', applyThemeFromStorage);
-} else {
-    applyThemeFromStorage();
 }
 
-// Handle theme switching after DOM loads
-document.addEventListener('DOMContentLoaded', () => {
-    const themeRadios = document.querySelectorAll('input[name="theme-dropdown"]');
-    if (!themeRadios.length) return;
-  
-    // Set the correct radio button as checked based on stored theme
-    const storedTheme = localStorage.getItem('theme') || 'default';
-    themeRadios.forEach(radio => {
-        if (radio.value === storedTheme) {
-            radio.checked = true;
-        }
-    });
-  
-    // Listen for theme changes
-    themeRadios.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                const theme = e.target.value;
-                document.documentElement.setAttribute('data-theme', theme);
-                if (document.body) {
-                    document.body.setAttribute('data-theme', theme);
-                }
-                localStorage.setItem('theme', theme);
-                console.log('Theme changed to:', theme); // Debug log
-            }
-        });
-    });
+// Handle Turbo navigation events
+document.addEventListener('turbo:load', applyThemeFromStorage);
+document.addEventListener('turbo:render', applyThemeFromStorage);
+document.addEventListener('turbo:before-cache', applyThemeFromStorage);
+
+// Handle page visibility changes
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        applyThemeFromStorage();
+    }
 });
 
-// Also handle Turbo navigation (Rails 7 with Hotwire)
-document.addEventListener('turbo:load', () => {
-    applyThemeFromStorage();
-    
-    // Re-check the correct radio button after Turbo navigation
-    setTimeout(() => {
-        const themeRadios = document.querySelectorAll('input[name="theme-dropdown"]');
-        const storedTheme = localStorage.getItem('theme') || 'default';
-        themeRadios.forEach(radio => {
-            radio.checked = (radio.value === storedTheme);
-        });
-        console.log('Theme restored on turbo:load:', storedTheme); // Debug log
-    }, 10); // Small delay to ensure DOM is ready
-});
-
-// Handle turbo:before-cache to preserve theme
-document.addEventListener('turbo:before-cache', () => {
-    applyThemeFromStorage();
-});
+// Export for global access
+window.applyThemeFromStorage = applyThemeFromStorage;
   
