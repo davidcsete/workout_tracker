@@ -1,38 +1,40 @@
-<footer class="btm-nav fixed bottom-0 w-full z-50 bg-base-100 shadow-md flex flex-row items-stretch justify-between footer">
+<footer class="btm-nav fixed bottom-0 w-full z-50 bg-base-100 shadow-md flex flex-row items-stretch justify-center footer">
   <% if user_signed_in? %>
-  <!-- Workout Plans (Left) -->
-  <%= link_to workout_plans_path, class: "text-secondary flex flex-col items-center ml-15" do %>
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor"
-         viewBox="0 0 24 24">
-      <path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29l-1.43-1.43z"/>
-      <circle cx="6.5" cy="6.5" r="2"/>
-      <circle cx="17.5" cy="6.5" r="2"/>
-      <circle cx="6.5" cy="17.5" r="2"/>
-      <circle cx="17.5" cy="17.5" r="2"/>
-      <rect x="8" y="11" width="8" height="2" rx="1"/>
-    </svg>
-    <span class="text-xs">Workouts</span>
-  <% end %>
+  <div class="flex justify-center items-center w-full max-w-md mx-auto">
+    <!-- Workout Plans (Left) -->
+    <%= link_to workout_plans_path, class: "text-secondary flex flex-col items-center flex-1" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor"
+           viewBox="0 0 24 24">
+        <path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29l-1.43-1.43z"/>
+        <circle cx="6.5" cy="6.5" r="2"/>
+        <circle cx="17.5" cy="6.5" r="2"/>
+        <circle cx="6.5" cy="17.5" r="2"/>
+        <circle cx="17.5" cy="17.5" r="2"/>
+        <rect x="8" y="11" width="8" height="2" rx="1"/>
+      </svg>
+      <span class="text-xs">Workouts</span>
+    <% end %>
 
-  <!-- Home (Center) -->
-  <%= link_to root_path, class: "text-primary flex flex-col items-center" do %>
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-         viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M3 10l9-7 9 7v10a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-    </svg>
-    <span class="text-xs">Home</span>
-  <% end %>
+    <!-- Home (Center) -->
+    <%= link_to root_path, class: "text-primary flex flex-col items-center flex-1" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+           viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 10l9-7 9 7v10a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+      </svg>
+      <span class="text-xs">Home</span>
+    <% end %>
 
-  <!-- Diet (Right) -->
-  <%= link_to meals_path, class: "text-accent flex flex-col items-center mr-15" do %>
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-         viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M12 6V4m0 16v-2m8-8h2M4 12H2m15.364 6.364l1.414 1.414M6.222 6.222l1.414 1.414M17.778 6.222l1.414-1.414M6.222 17.778l-1.414 1.414M12 8a4 4 0 100 8 4 4 0 000-8z" />
-    </svg>
-    <span class="text-xs">Diet</span>
-  <% end %>
+    <!-- Diet (Right) -->
+    <%= link_to meals_path, class: "text-accent flex flex-col items-center flex-1" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+           viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 6V4m0 16v-2m8-8h2M4 12H2m15.364 6.364l1.414 1.414M6.222 6.222l1.414 1.414M17.778 6.222l1.414-1.414M6.222 17.778l-1.414 1.414M12 8a4 4 0 100 8 4 4 0 000-8z" />
+      </svg>
+      <span class="text-xs">Diet</span>
+    <% end %>
+  </div>
 <% end %>
 </footer>
 
