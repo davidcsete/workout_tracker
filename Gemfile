@@ -74,3 +74,5 @@ gem "devise", "~> 4.9"
 gem "rspec-rails", "~> 7.1", groups: [ :development, :test ]
 
 gem "byebug", "~> 12.0", groups: [ :development, :test ]
+
+gem "dockerfile-rails", ">= 1.7", :group => :development

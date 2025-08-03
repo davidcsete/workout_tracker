@@ -40,14 +40,13 @@
     <link rel="apple-touch-icon" href="/icon.png">
     <%= tag.link href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap", rel: "stylesheet" %>
     <%= javascript_importmap_tags %>
-    <%= javascript_include_tag "application", type: "module", defer: true %>
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   </head>
 
-  <body class="w-full max-w-none p-0 m-0">
+  <body class="w-full max-w-none p-0 m-0" data-controller="page-transitions">
       <%= render "shared/navbar" %>
       <main class="container mx-auto mt-0 px-5 pb-20">
         <div id="flash-container">
