@@ -11,6 +11,7 @@ export default class extends Controller {
     let isBack = false;
     let lastUrl = window.location.href;
     let transitionId = 0;
+    let pendingTransition = false;
 
     // Track back navigation
     window.addEventListener("popstate", () => {
@@ -29,25 +30,22 @@ export default class extends Controller {
       }
     });
 
-    // Reset back flag on regular navigation (but not immediately)
-    document.addEventListener("turbo:before-visit", (event) => {
-      // Only reset if this is NOT a popstate navigation
-      if (!isBack) {
-        console.log("Regular navigation detected");
-      }
-    });
-
-    // Apply transitions with ultra-aggressive deduplication
-    document.addEventListener("turbo:render", () => {
+    // Apply transitions on turbo:before-render (earlier in the process)
+    document.addEventListener("turbo:before-render", () => {
       const currentUrl = window.location.href;
       const currentId = ++transitionId;
 
-      // Skip if URL hasn't changed (duplicate event)
-      if (currentUrl === lastUrl) {
-        console.log("Skipped: same URL");
+      // More lenient URL check - compare pathname and search only
+      const currentPath = new URL(currentUrl).pathname + new URL(currentUrl).search;
+      const lastPath = new URL(lastUrl).pathname + new URL(lastUrl).search;
+
+      // Skip if path hasn't changed or we already have a pending transition
+      if (currentPath === lastPath || pendingTransition) {
+        console.log("Skipped: same path or pending transition");
         return;
       }
 
+      pendingTransition = true;
       lastUrl = currentUrl;
       const direction = isBack ? "back" : "forward";
 
@@ -57,16 +55,14 @@ export default class extends Controller {
       const body = document.body;
       body.classList.remove("animate-slide-in-left", "animate-slide-in-right");
 
-      // Small delay to ensure clean transition
-      requestAnimationFrame(() => {
-        if (direction === "forward") {
-          body.classList.add("animate-slide-in-right");
-          console.log("Applied: animate-slide-in-right");
-        } else {
-          body.classList.add("animate-slide-in-left");
-          console.log("Applied: animate-slide-in-left");
-        }
-      });
+      // Apply the animation class
+      if (direction === "forward") {
+        body.classList.add("animate-slide-in-right");
+        console.log("Applied: animate-slide-in-right");
+      } else {
+        body.classList.add("animate-slide-in-left");
+        console.log("Applied: animate-slide-in-left");
+      }
 
       // Clean up after animation
       setTimeout(() => {
@@ -74,6 +70,7 @@ export default class extends Controller {
           "animate-slide-in-left",
           "animate-slide-in-right"
         );
+        pendingTransition = false;
       }, 300);
 
       // Reset back flag AFTER using it

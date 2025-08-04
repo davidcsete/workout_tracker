@@ -166,4 +166,41 @@ export default class extends Controller {
       console.log(`Reorder exercise ${draggedId} to position of ${targetId}`)
     }
   }
+
+  // Handle exercise deletion with animation
+  deleteExercise(event) {
+    const button = event.currentTarget
+    const exerciseCard = button.closest('[data-exercise-id]')
+    
+    // Add deletion animation class
+    exerciseCard.classList.add('deleting')
+    
+    // Update total exercises count
+    this.totalExercisesValue -= 1
+    
+    // Update progress after deletion
+    setTimeout(() => {
+      this.updateOverallProgress()
+      this.updateExerciseCounts()
+    }, 300)
+  }
+
+  // Update exercise counts in the UI
+  updateExerciseCounts() {
+    const totalElements = document.querySelectorAll('[data-total-exercises]')
+    totalElements.forEach(element => {
+      element.textContent = this.totalExercisesValue
+    })
+    
+    // Update day-specific counts
+    const dayCards = document.querySelectorAll('[data-day]')
+    dayCards.forEach(dayCard => {
+      const day = dayCard.dataset.day
+      const exercisesInDay = dayCard.querySelectorAll('[data-exercise-id]').length
+      const dayCountElement = dayCard.querySelector(`[data-day-exercises="${day}"]`)
+      if (dayCountElement) {
+        dayCountElement.textContent = `${exercisesInDay} exercises planned`
+      }
+    })
+  }
 }
