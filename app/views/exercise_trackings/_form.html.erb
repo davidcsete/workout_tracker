@@ -101,11 +101,14 @@
 
   <!-- Submit Button -->
   <div class="form-control mt-8">
-    <%= form.submit "Log This Set", 
+    <% submit_text = exercise_tracking.persisted? ? "Update Set" : "Log This Set" %>
+    <% loading_text = exercise_tracking.persisted? ? "Updating Set..." : "Logging Set..." %>
+    
+    <%= form.submit submit_text, 
         class: "btn btn-primary btn-lg w-full gap-2 text-lg font-bold",
         data: { 
-          turbo_submits_with: "Logging Set...",
-          disable_with: "Logging Set...",
+          turbo_submits_with: loading_text,
+          disable_with: loading_text,
           form_validation_target: "submitButton"
         } %>
   </div>
