@@ -4,77 +4,79 @@ export default class extends Controller {
   static targets = [];
 
   connect() {
-    // Ultra-simple approach that works despite double firing
-    if (window.transitionSetup) return;
-    window.transitionSetup = true;
+    console.log("Page transitions controller connected");
+    this.setupTransitions();
+  }
 
-    let isBack = false;
-    let lastUrl = window.location.href;
-    let transitionId = 0;
-    let pendingTransition = false;
+  setupTransitions() {
+    let isBackNavigation = false;
 
-    // Track back navigation
+    // Simple test - apply animation on every page load
+    document.addEventListener("turbo:load", () => {
+      console.log("Turbo load event - applying test animation");
+      this.testAnimation();
+    });
+
+    // Track browser back button
     window.addEventListener("popstate", () => {
-      console.log("Popstate detected - setting back navigation");
-      isBack = true;
+      console.log("Browser back button pressed");
+      isBackNavigation = true;
     });
 
-    // Track clicks on "Back" links/buttons
+    // Track clicks on links/buttons that might be "back" actions
     document.addEventListener("click", (event) => {
-      const clickedElement = event.target;
-      const text = clickedElement.textContent || clickedElement.innerText || "";
+      const element = event.target.closest('a, button');
+      if (!element) return;
 
-      if (text.toLowerCase().includes("back")) {
-        console.log("Back link clicked - setting back navigation");
-        isBack = true;
+      const text = (element.textContent || "").toLowerCase();
+      if (text.includes("back") || text.includes("←")) {
+        console.log("Back link clicked");
+        isBackNavigation = true;
       }
     });
 
-    // Apply transitions on turbo:before-render (earlier in the process)
+    // Apply transition on navigation
     document.addEventListener("turbo:before-render", () => {
-      const currentUrl = window.location.href;
-      const currentId = ++transitionId;
-
-      // More lenient URL check - compare pathname and search only
-      const currentPath = new URL(currentUrl).pathname + new URL(currentUrl).search;
-      const lastPath = new URL(lastUrl).pathname + new URL(lastUrl).search;
-
-      // Skip if path hasn't changed or we already have a pending transition
-      if (currentPath === lastPath || pendingTransition) {
-        console.log("Skipped: same path or pending transition");
-        return;
-      }
-
-      pendingTransition = true;
-      lastUrl = currentUrl;
-      const direction = isBack ? "back" : "forward";
-
-      console.log(`Transition ${currentId}:`, direction, `(isBack: ${isBack})`);
-
-      // Apply transition immediately
-      const body = document.body;
-      body.classList.remove("animate-slide-in-left", "animate-slide-in-right");
-
-      // Apply the animation class
-      if (direction === "forward") {
-        body.classList.add("animate-slide-in-right");
-        console.log("Applied: animate-slide-in-right");
-      } else {
-        body.classList.add("animate-slide-in-left");
-        console.log("Applied: animate-slide-in-left");
-      }
-
-      // Clean up after animation
-      setTimeout(() => {
-        body.classList.remove(
-          "animate-slide-in-left",
-          "animate-slide-in-right"
-        );
-        pendingTransition = false;
-      }, 300);
-
-      // Reset back flag AFTER using it
-      isBack = false;
+      console.log("Before render - applying transition", isBackNavigation ? "back" : "forward");
+      
+      const direction = isBackNavigation ? "back" : "forward";
+      this.applyTransition(direction);
+      
+      // Reset back flag
+      isBackNavigation = false;
     });
+  }
+
+  testAnimation() {
+    const body = document.body;
+    body.classList.add("animate-slide-in-right");
+    console.log("Test animation applied");
+    
+    setTimeout(() => {
+      body.classList.remove("animate-slide-in-right");
+      console.log("Test animation removed");
+    }, 300);
+  }
+
+  applyTransition(direction) {
+    const body = document.body;
+    
+    // Remove any existing animation classes
+    body.classList.remove("animate-slide-in-left", "animate-slide-in-right");
+    
+    // Apply the appropriate animation
+    if (direction === "forward") {
+      body.classList.add("animate-slide-in-right");
+      console.log("Applied forward transition (slide from right)");
+    } else {
+      body.classList.add("animate-slide-in-left");
+      console.log("Applied back transition (slide from left)");
+    }
+    
+    // Clean up after animation
+    setTimeout(() => {
+      body.classList.remove("animate-slide-in-left", "animate-slide-in-right");
+      console.log("Transition cleanup completed");
+    }, 300);
   }
 }

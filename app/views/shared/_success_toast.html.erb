@@ -1,0 +1,15 @@
+<div class="toast toast-top toast-end z-50" 
+     data-controller="auto-dismiss scroll" 
+     data-auto-dismiss-delay-value="3000"
+     data-scroll-target-value="<%= scroll_target if defined?(scroll_target) && scroll_target %>"
+     data-scroll-behavior-value="smooth">
+  <div class="alert alert-success shadow-lg max-w-sm">
+    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <div>
+      <div class="font-bold">🎉 <%= message %></div>
+      <div class="text-sm opacity-90"><%= details %></div>
+    </div>
+  </div>
+</div>

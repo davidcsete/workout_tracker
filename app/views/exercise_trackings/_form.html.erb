@@ -1,4 +1,4 @@
-<%= form_with(model: exercise_tracking, turbo_stream: true, class: "space-y-6") do |form| %>
+<%= form_with(model: exercise_tracking, turbo_stream: true, class: "space-y-6", data: { controller: "form-validation" }) do |form| %>
   <% if exercise_tracking.errors.any? %>
     <div class="alert alert-error">
       <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
@@ -39,9 +39,11 @@
         <%= form.number_field :reps, 
             class: ["input input-bordered input-lg text-center text-2xl font-bold", 
                    {"input-error": exercise_tracking.errors[:reps].any?}],
-            placeholder: "0",
-            min: 0,
-            step: 1 %>
+            placeholder: "Enter reps",
+            min: 1,
+            step: 1,
+            required: true,
+            data: { form_validation_target: "repsInput" } %>
         <span class="bg-base-200 px-4 flex items-center text-base-content/70 font-medium">reps</span>
       </div>
       <% if exercise_tracking.errors[:reps].any? %>
@@ -62,9 +64,11 @@
         <%= form.number_field :weight, 
             class: ["input input-bordered input-lg text-center text-2xl font-bold", 
                    {"input-error": exercise_tracking.errors[:weight].any?}],
-            placeholder: "0",
-            min: 0,
-            step: 0.5 %>
+            placeholder: "Enter weight",
+            min: 0.5,
+            step: 0.5,
+            required: true,
+            data: { form_validation_target: "weightInput" } %>
         <span class="bg-base-200 px-4 flex items-center text-base-content/70 font-medium">kg</span>
       </div>
       <% if exercise_tracking.errors[:weight].any? %>
@@ -98,11 +102,11 @@
   <!-- Submit Button -->
   <div class="form-control mt-8">
     <%= form.submit "Log This Set", 
-        class: "btn btn-primary btn-lg w-full gap-2 text-lg font-bold" do %>
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-      </svg>
-      Log This Set
-    <% end %>
+        class: "btn btn-primary btn-lg w-full gap-2 text-lg font-bold",
+        data: { 
+          turbo_submits_with: "Logging Set...",
+          disable_with: "Logging Set...",
+          form_validation_target: "submitButton"
+        } %>
   </div>
 <% end %>
