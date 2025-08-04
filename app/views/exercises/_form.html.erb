@@ -21,21 +21,24 @@
     <%= form.textarea :description, rows: 4, class: ["textarea textarea-bordered w-full", {"textarea-error": exercise.errors[:description].any?}] %>
   </div>
 
-  <div class="form-control my-5">
-    <%= label_tag :day_of_the_week, "Day of the Week", class: "label" %>
-    <%= select_tag :day_of_the_week, 
-        options_for_select([
-          ['Monday', 'monday'],
-          ['Tuesday', 'tuesday'], 
-          ['Wednesday', 'wednesday'],
-          ['Thursday', 'thursday'],
-          ['Friday', 'friday'],
-          ['Saturday', 'saturday'],
-          ['Sunday', 'sunday']
-        ], params[:day_of_the_week]), 
-        { class: "select select-bordered w-full", 
-          prompt: "Select a day" } %>
-  </div>
+  <% if @workout_plan %>
+    <div class="form-control my-5">
+      <%= label_tag :day_of_the_week, "Day of the Week", class: "label" %>
+      <% current_day = @workout_plan.workout_plan_exercises.find_by(exercise: exercise)&.day_of_the_week || params[:day_of_the_week] %>
+      <%= select_tag :day_of_the_week, 
+          options_for_select([
+            ['Monday', 'monday'],
+            ['Tuesday', 'tuesday'], 
+            ['Wednesday', 'wednesday'],
+            ['Thursday', 'thursday'],
+            ['Friday', 'friday'],
+            ['Saturday', 'saturday'],
+            ['Sunday', 'sunday']
+          ], current_day), 
+          { class: "select select-bordered w-full", 
+            prompt: "Select a day" } %>
+    </div>
+  <% end %>
 
   <div class="inline">
     <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 btn btn-primary text-white inline-block font-medium cursor-pointer" %>

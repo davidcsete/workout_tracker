@@ -1,10 +1,42 @@
 <% content_for :title, "Editing exercise" %>
 
-<div class="md:w-2/3 w-full">
-  <h1 class="font-bold text-4xl">Editing exercise</h1>
+<div class="min-h-screen bg-gradient-to-br from-base-100 to-base-200 pb-20">
+  <!-- Header Section -->
+  <div class="hero bg-gradient-to-r from-primary to-secondary text-primary-content py-6 sm:py-8">
+    <div class="hero-content text-center max-w-4xl px-4">
+      <div class="w-full">
+        <h1 class="text-2xl sm:text-3xl font-bold mb-4">Edit Exercise</h1>
+        <% if @workout_plan %>
+          <p class="text-base sm:text-lg opacity-90">Updating exercise in "<%= @workout_plan.name %>"</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
 
-  <%= render "form", exercise: @exercise %>
-
-  <%= link_to "Show this exercise", @exercise, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-500 hover:bg-gray-400 inline-block font-medium" %>
-  <%= link_to "Back to exercises", exercises_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-500 hover:bg-gray-400 inline-block font-medium" %>
+  <!-- Form Section -->
+  <div class="px-4 py-6 max-w-2xl mx-auto">
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body p-6">
+        <%= render "form", exercise: @exercise %>
+        
+        <div class="card-actions justify-between mt-6">
+          <% if @workout_plan %>
+            <%= link_to workout_plan_exercises_path(@workout_plan), class: "btn btn-ghost" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              Back to Workout Plan
+            <% end %>
+          <% else %>
+            <%= link_to exercises_path, class: "btn btn-ghost" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              Back to Exercises
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
