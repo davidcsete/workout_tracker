@@ -1,4 +1,6 @@
 class ExerciseTrackingsController < ApplicationController
+  include ActionView::RecordIdentifier
+
   before_action :set_exercise_tracking, only: %i[ show edit update destroy ]
   respond_to :html, :turbo_stream
 
@@ -55,7 +57,7 @@ class ExerciseTrackingsController < ApplicationController
 
       respond_to do |format|
         format.turbo_stream {
-          render turbo_stream: [
+          streams = [
             turbo_stream.replace(
               "exercise_#{@exercise.id}",
               partial: "exercises/exercise",
@@ -65,15 +67,47 @@ class ExerciseTrackingsController < ApplicationController
               "tracking_feed",
               partial: "exercise_trackings/feed",
               locals: { exercise_trackings: @exercise_trackings }
+            ),
+            turbo_stream.prepend(
+              "success_notifications",
+              partial: "shared/success_toast",
+              locals: {
+                message: "Set logged successfully!",
+                details: "#{@exercise_tracking.reps} reps × #{@exercise_tracking.weight}kg",
+                scroll_target: dom_id(@exercise_tracking)
+              }
             )
           ]
+
+
+
+          render turbo_stream: streams
         }
         format.html {
           redirect_to workout_plan_exercises_path(@workout_plan), notice: "Exercise tracked successfully!"
         }
       end
     else
-      render :new
+      @date = params[:date] ? Date.parse(params[:date]) : Date.current
+      @exercise_trackings = ExerciseTracking
+                              .where(exercise: @exercise, user: current_user)
+                              .where("performed_at >= ? AND performed_at < ?", @date.beginning_of_day, @date.end_of_day)
+                              .order(performed_at: :desc)
+
+      respond_to do |format|
+        format.turbo_stream {
+          render turbo_stream: turbo_stream.update(
+            "exercise_tracking_form",
+            partial: "exercise_trackings/form",
+            locals: {
+              exercise_tracking: @exercise_tracking,
+              exercise: @exercise,
+              date: @date
+            }
+          )
+        }
+        format.html { render :new, status: :unprocessable_entity }
+      end
     end
   end
 

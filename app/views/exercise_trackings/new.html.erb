@@ -1,5 +1,8 @@
 <% content_for :title, "Track Exercise" %>
 
+<!-- Success Notifications Container -->
+<div id="success_notifications"></div>
+
 <div class="min-h-screen bg-gradient-to-br from-base-100 to-base-200">
   <div data-controller="exercise-date" 
        data-workout-plan-id="<%= @workout_plan.id %>" 
@@ -46,7 +49,9 @@
               Log Your Set
             </h3>
             
-            <%= render "form", exercise_tracking: @exercise_tracking, exercise: @exercise, date: @date %>
+            <div id="exercise_tracking_form">
+              <%= render "form", exercise_tracking: @exercise_tracking, exercise: @exercise, date: @date %>
+            </div>
           </div>
         </div>
       </div>
