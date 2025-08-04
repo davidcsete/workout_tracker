@@ -30,6 +30,7 @@ Rails.application.routes.draw do
     resources :exercises, only: [ :index, :new, :create ] do
       resources :exercise_trackings, only: [ :new, :create ]
     end
+    resources :workout_plan_exercises, only: [ :destroy ]
   end
   namespace :api do
     resources :exercise_trackings, only: [ :index ]
