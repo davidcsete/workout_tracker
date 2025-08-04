@@ -1,6 +1,7 @@
 class ExercisesController < ApplicationController
   before_action :set_exercise, only: %i[ show edit update destroy ]
-  before_action :set_workout_plan, only: %i[ new create index ]
+  before_action :set_workout_plan, only: %i[ new create index edit update ]
+  before_action :ensure_workout_plan_owner, only: %i[ edit update ], if: -> { @workout_plan.present? }
 
   # GET /exercises or /exercises.json
   def index
@@ -63,7 +64,27 @@ class ExercisesController < ApplicationController
   def update
     respond_to do |format|
       if @exercise.update(exercise_params)
-        format.html { redirect_to @exercise, notice: "Exercise was successfully updated." }
+        # Update the day of the week if provided and we're in workout plan context
+        if @workout_plan && params[:day_of_the_week].present?
+          workout_plan_exercise = @workout_plan.workout_plan_exercises.find_by(exercise: @exercise)
+          if workout_plan_exercise && workout_plan_exercise.day_of_the_week != params[:day_of_the_week]
+            # Get the next order for the new day
+            next_order = @workout_plan.workout_plan_exercises
+                                      .where(day_of_the_week: params[:day_of_the_week])
+                                      .maximum(:order).to_i + 1
+
+            workout_plan_exercise.update!(
+              day_of_the_week: params[:day_of_the_week],
+              order: next_order
+            )
+          end
+        end
+
+        if @workout_plan
+          format.html { redirect_to workout_plan_exercises_path(@workout_plan), notice: "Exercise was successfully updated." }
+        else
+          format.html { redirect_to @exercise, notice: "Exercise was successfully updated." }
+        end
         format.json { render :show, status: :ok, location: @exercise }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -94,6 +115,12 @@ class ExercisesController < ApplicationController
     end
 
     def set_workout_plan
-      @workout_plan = WorkoutPlan.find(params[:workout_plan_id])
+      @workout_plan = WorkoutPlan.find(params[:workout_plan_id]) if params[:workout_plan_id]
+    end
+
+    def ensure_workout_plan_owner
+      unless @workout_plan.user == current_user
+        redirect_to workout_plan_exercises_path(@workout_plan), alert: "You can only edit exercises in your own workout plans."
+      end
     end
 end

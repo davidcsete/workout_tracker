@@ -27,7 +27,7 @@ Rails.application.routes.draw do
     member do
       post :duplicate
     end
-    resources :exercises, only: [ :index, :new, :create ] do
+    resources :exercises, only: [ :index, :new, :create, :edit, :update ] do
       resources :exercise_trackings, only: [ :new, :create ]
     end
     resources :workout_plan_exercises, only: [ :destroy ]
