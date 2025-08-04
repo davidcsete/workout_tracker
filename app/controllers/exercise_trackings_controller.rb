@@ -35,6 +35,8 @@ class ExerciseTrackingsController < ApplicationController
   def edit
     @exercise_tracking = ExerciseTracking.find(params[:id])
     @exercise = @exercise_tracking.exercise
+    @workout_plan = WorkoutPlan.find_by(id: params[:workout_plan_id]) || @exercise.workout_plan_exercises.first&.workout_plan
+    @date = @exercise_tracking.performed_at.to_date
   end
 
   # POST /exercise_trackings or /exercise_trackings.json
@@ -113,11 +115,52 @@ class ExerciseTrackingsController < ApplicationController
 
   # PATCH/PUT /exercise_trackings/1 or /exercise_trackings/1.json
   def update
+    @exercise = @exercise_tracking.exercise
+    @workout_plan = WorkoutPlan.find_by(id: params[:workout_plan_id]) || @exercise.workout_plan_exercises.first&.workout_plan
+    @date = @exercise_tracking.performed_at.to_date
+    
     respond_to do |format|
       if @exercise_tracking.update(exercise_tracking_params)
-        format.html { redirect_to @exercise_tracking, notice: "Exercise tracking was successfully updated." }
+        # Reload trackings for the current date
+        @exercise_trackings = ExerciseTracking
+                                .where(exercise: @exercise, user: current_user)
+                                .where("performed_at >= ? AND performed_at < ?", @date.beginning_of_day, @date.end_of_day)
+                                .order(performed_at: :desc)
+
+        format.turbo_stream {
+          render turbo_stream: [
+            turbo_stream.replace(
+              "tracking_feed",
+              partial: "exercise_trackings/feed",
+              locals: { exercise_trackings: @exercise_trackings }
+            ),
+            turbo_stream.prepend(
+              "success_notifications",
+              partial: "shared/success_toast",
+              locals: {
+                message: "Set updated successfully!",
+                details: "#{@exercise_tracking.reps} reps × #{@exercise_tracking.weight}kg"
+              }
+            )
+          ]
+        }
+        format.html { 
+          if @workout_plan
+            redirect_to new_workout_plan_exercise_exercise_tracking_path(@workout_plan, @exercise), 
+                        notice: "Exercise tracking was successfully updated."
+          else
+            redirect_to @exercise_tracking, notice: "Exercise tracking was successfully updated."
+          end
+        }
         format.json { render :show, status: :ok, location: @exercise_tracking }
       else
+        format.turbo_stream {
+          render turbo_stream: turbo_stream.update(
+            "edit_form",
+            partial: "exercise_trackings/edit_form",
+            locals: { exercise_tracking: @exercise_tracking }
+          )
+        }
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @exercise_tracking.errors, status: :unprocessable_entity }
       end
@@ -126,10 +169,44 @@ class ExerciseTrackingsController < ApplicationController
 
   # DELETE /exercise_trackings/1 or /exercise_trackings/1.json
   def destroy
+    @exercise = @exercise_tracking.exercise
+    @workout_plan = WorkoutPlan.find_by(id: params[:workout_plan_id]) || @exercise.workout_plan_exercises.first&.workout_plan
+    @date = @exercise_tracking.performed_at.to_date
+    
     @exercise_tracking.destroy!
 
+    # Reload trackings for the current date
+    @exercise_trackings = ExerciseTracking
+                            .where(exercise: @exercise, user: current_user)
+                            .where("performed_at >= ? AND performed_at < ?", @date.beginning_of_day, @date.end_of_day)
+                            .order(performed_at: :desc)
+
     respond_to do |format|
-      format.html { redirect_to exercise_trackings_path, status: :see_other, notice: "Exercise tracking was successfully destroyed." }
+      format.turbo_stream {
+        render turbo_stream: [
+          turbo_stream.replace(
+            "tracking_feed",
+            partial: "exercise_trackings/feed",
+            locals: { exercise_trackings: @exercise_trackings }
+          ),
+          turbo_stream.prepend(
+            "success_notifications",
+            partial: "shared/success_toast",
+            locals: {
+              message: "Set deleted successfully!",
+              details: "Exercise tracking removed"
+            }
+          )
+        ]
+      }
+      format.html { 
+        if @workout_plan
+          redirect_to new_workout_plan_exercise_exercise_tracking_path(@workout_plan, @exercise), 
+                      status: :see_other, notice: "Exercise tracking was successfully deleted."
+        else
+          redirect_to exercise_trackings_path, status: :see_other, notice: "Exercise tracking was successfully deleted."
+        end
+      }
       format.json { head :no_content }
     end
   end

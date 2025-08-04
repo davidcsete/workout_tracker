@@ -1,10 +1,53 @@
-<% content_for :title, "Editing exercise tracking" %>
+<% content_for :title, "Edit Set" %>
 
-<div class="md:w-2/3 w-full">
-  <h1 class="font-bold text-4xl">Editing exercise tracking</h1>
+<!-- Success Notifications Container -->
+<div id="success_notifications"></div>
 
-  <%= render "form", exercise_tracking: @exercise_tracking %>
+<div class="min-h-screen bg-gradient-to-br from-base-100 to-base-200">
+  <div class="container mx-auto px-4 py-6 max-w-2xl">
+    
+    <!-- Header Section -->
+    <div class="hero bg-gradient-to-r from-primary to-secondary text-primary-content rounded-2xl mb-8">
+      <div class="hero-content text-center py-8">
+        <div>
+          <h1 class="text-3xl font-bold mb-2">Edit Set</h1>
+          <h2 class="text-xl opacity-90"><%= @exercise.name %></h2>
+          <p class="text-sm opacity-75">
+            <%= @date.strftime("%B %-d, %Y") %>
+          </p>
+        </div>
+      </div>
+    </div>
 
-  <%= link_to "Show this exercise tracking", @exercise_tracking, class: "w-full btn btn-primary my-4" %>
-  <%= link_to "Back to exercise trackings", exercise_trackings_path(exercise_id:params[:exercise_id], workout_plan_id: params[:workout_plan_id],  ), class: "w-full btn btn-secondary" %>
+    <!-- Edit Form -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h3 class="card-title text-2xl mb-6">Update Your Set</h3>
+        
+        <div id="edit_form">
+          <%= render "form", exercise_tracking: @exercise_tracking, exercise: @exercise, date: @date %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Actions -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+      <% if @workout_plan %>
+        <%= link_to new_workout_plan_exercise_exercise_tracking_path(@workout_plan, @exercise), 
+            class: "btn btn-ghost gap-2" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Back to Tracking
+        <% end %>
+      <% else %>
+        <%= link_to exercise_trackings_path, class: "btn btn-ghost gap-2" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Back to Trackings
+        <% end %>
+      <% end %>
+    </div>
+  </div>
 </div>
