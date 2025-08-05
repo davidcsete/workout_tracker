@@ -4,7 +4,7 @@ export default class extends Controller {
   static targets = [];
 
   connect() {
-    console.log("Page transitions controller connected - delegating to page_transitions.js");
-    // This controller is now inactive - all transition logic handled by page_transitions.js
+    // Controller is inactive - all logic handled by page_transitions.js
+    // Removed console.log to prevent spam
   }
 }

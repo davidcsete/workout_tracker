@@ -31,10 +31,25 @@
     sessionStorage.setItem("currentIndex", newIndex);
   });
 
+  let lastVisitTime = 0;
+  let lastVisitUrl = "";
+
   document.addEventListener("turbo:before-visit", (event) => {
+    const now = Date.now();
+    const targetUrl = event.detail.url;
+
+    // Prevent rapid duplicate visits to the same URL
+    if (now - lastVisitTime < 300 && targetUrl === lastVisitUrl) {
+      event.preventDefault();
+      return;
+    }
+
+    lastVisitTime = now;
+    lastVisitUrl = targetUrl;
+
     // Check if this is a back navigation by looking at the URL
     const currentPath = location.pathname;
-    const targetPath = new URL(event.detail.url).pathname;
+    const targetPath = new URL(targetUrl).pathname;
 
     const currentIndex = navStack.indexOf(currentPath);
     const targetIndex = navStack.indexOf(targetPath);
@@ -53,17 +68,24 @@
 
   let lastTransitionTime = 0;
   let lastTransitionUrl = "";
+  let isTransitioning = false;
 
   document.addEventListener("turbo:render", (event) => {
     const now = Date.now();
     const currentUrl = window.location.href;
 
-    // Debounce: only apply transition if it's been more than 100ms since last transition
-    // OR if it's a different URL
-    if (now - lastTransitionTime < 100 && currentUrl === lastTransitionUrl) {
+    // Prevent multiple transitions from running simultaneously
+    if (isTransitioning) {
       return;
     }
 
+    // Debounce: only apply transition if it's been more than 200ms since last transition
+    // OR if it's a different URL
+    if (now - lastTransitionTime < 200 && currentUrl === lastTransitionUrl) {
+      return;
+    }
+
+    isTransitioning = true;
     lastTransitionTime = now;
     lastTransitionUrl = currentUrl;
 
@@ -89,7 +111,8 @@
         "animate-slide-in-left",
         "animate-slide-in-right"
       );
-    }, 300);
+      isTransitioning = false; // Reset the flag
+    }, 400); // Slightly longer timeout to ensure animation completes
   });
 
   document.addEventListener("turbo:before-stream-render", (event) => {
