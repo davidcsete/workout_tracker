@@ -4,7 +4,15 @@ class MealsController < ApplicationController
   # GET /meals or /meals.json
   def index
     @date = params[:date] ? Date.parse(params[:date]) : Date.current
-    @meals = current_user.meals.where(consumed_at: @date.all_day).includes(:food_items).order(meal_type: :asc)
+
+    # Get existing meals for the date
+    existing_meals = current_user.meals.where(consumed_at: @date.all_day).includes(:food_items)
+
+    # Create meal objects for all meal types, using existing ones where available
+    @meals = Meal.meal_types.keys.map do |meal_type|
+      existing_meals.find { |m| m.meal_type == meal_type } ||
+      Meal.new(meal_type: meal_type, user: current_user, consumed_at: @date)
+    end
 
     respond_to do |format|
       format.html do

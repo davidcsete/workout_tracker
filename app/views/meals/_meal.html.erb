@@ -1,4 +1,4 @@
-<div class="card bg-base-100 shadow-xl border-l-4 border-l-primary mb-6">
+<div class="card bg-base-100 shadow-xl border-l-4 border-l-primary mb-6" <% if meal.persisted? %>id="<%= dom_id(meal) %>"<% end %>>
   <div class="card-body">
     <!-- Meal Header -->
     <div class="flex justify-between items-center mb-4">
@@ -17,18 +17,29 @@
           </div>
         </div>
         <div>
-          <h2 class="text-2xl font-bold"><%= meal.meal_type.titleize %></h2>
+          <h2 class="text font-bold"><%= meal.meal_type.titleize %></h2>
           <p class="text-sm text-base-content/70"><%= meal.food_items.count %> items</p>
         </div>
       </div>
       
-      <%= link_to new_meal_food_item_path(meal, date: @date), 
-          class: "btn btn-primary btn-sm gap-2", 
-          data: { turbo_frame: "_top" } do %>
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-        </svg>
-        Add Food
+      <% if meal.persisted? %>
+        <%= link_to new_meal_food_item_path(meal, date: @date), 
+            class: "btn btn-primary btn-sm gap-2", 
+            data: { turbo_frame: "_top" } do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Add Food
+        <% end %>
+      <% else %>
+        <%= link_to new_food_item_path(meal_type: meal.meal_type, date: @date), 
+            class: "btn btn-primary btn-sm gap-2", 
+            data: { turbo_frame: "_top" } do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Add Food
+        <% end %>
       <% end %>
     </div>
 
@@ -36,16 +47,24 @@
     <% if meal.food_items.empty? %>
       <div class="text-center py-8 bg-base-200 rounded-lg">
         <p class="text-base-content/70 mb-4">No food items added yet</p>
-        <%= link_to new_meal_food_item_path(meal, date: @date), 
-            class: "btn btn-primary btn-sm", 
-            data: { turbo_frame: "_top" } do %>
-          Add First Item
+        <% if meal.persisted? %>
+          <%= link_to new_meal_food_item_path(meal, date: @date), 
+              class: "btn btn-primary btn-sm", 
+              data: { turbo_frame: "_top" } do %>
+            Add First Item
+          <% end %>
+        <% else %>
+          <%= link_to new_food_item_path(meal_type: meal.meal_type, date: @date), 
+              class: "btn btn-primary btn-sm", 
+              data: { turbo_frame: "_top" } do %>
+            Add First Item
+          <% end %>
         <% end %>
       </div>
     <% else %>
       <div class="space-y-3">
         <% meal.food_items.each do |item| %>
-          <div id="<%= dom_id(item) %>" class="card bg-base-200 shadow-sm">
+          <div <% if item.persisted? %>id="<%= dom_id(item) %>"<% end %> class="card bg-base-200 shadow-sm">
             <div class="card-body p-4">
               <div class="flex justify-between items-start">
                 <div class="flex-1">
@@ -84,37 +103,39 @@
       </div>
 
       <!-- Meal Totals -->
-      <div id="<%= dom_id(meal, :totals) %>" class="divider"></div>
-      <div class="stats stats-horizontal shadow w-full">
-        <% total_cals = meal.food_items.sum { |item| item.calories.to_f } %>
-        <% total_protein = meal.food_items.sum { |item| item.protein.to_f } %>
-        <% total_carbs = meal.food_items.sum { |item| item.carbs.to_f } %>
-        <% total_fat = meal.food_items.sum { |item| item.fats.to_f } %>
-        
-        <div class="stat place-items-center">
-          <div class="stat-title text-xs">Total Calories</div>
-          <div class="stat-value text-lg text-primary"><%= total_cals.to_i %></div>
-          <div class="stat-desc">kcal</div>
+      <% if meal.food_items.any? %>
+        <div <% if meal.persisted? %>id="<%= dom_id(meal, :totals) %>"<% end %> class="divider"></div>
+        <div class="stats stats-horizontal shadow w-full">
+          <% total_cals = meal.food_items.sum { |item| item.calories.to_f } %>
+          <% total_protein = meal.food_items.sum { |item| item.protein.to_f } %>
+          <% total_carbs = meal.food_items.sum { |item| item.carbs.to_f } %>
+          <% total_fat = meal.food_items.sum { |item| item.fats.to_f } %>
+          
+          <div class="stat place-items-center">
+            <div class="stat-title text-xs">Total Calories</div>
+            <div class="stat-value text-lg text-primary"><%= total_cals.to_i %></div>
+            <div class="stat-desc">kcal</div>
+          </div>
+          
+          <div class="stat place-items-center">
+            <div class="stat-title text-xs">Protein</div>
+            <div class="stat-value text-lg text-secondary"><%= total_protein.round(1) %></div>
+            <div class="stat-desc">grams</div>
+          </div>
+          
+          <div class="stat place-items-center">
+            <div class="stat-title text-xs">Carbs</div>
+            <div class="stat-value text-lg text-accent"><%= total_carbs.round(1) %></div>
+            <div class="stat-desc">grams</div>
+          </div>
+          
+          <div class="stat place-items-center">
+            <div class="stat-title text-xs">Fats</div>
+            <div class="stat-value text-lg text-warning"><%= total_fat.round(1) %></div>
+            <div class="stat-desc">grams</div>
+          </div>
         </div>
-        
-        <div class="stat place-items-center">
-          <div class="stat-title text-xs">Protein</div>
-          <div class="stat-value text-lg text-secondary"><%= total_protein.round(1) %></div>
-          <div class="stat-desc">grams</div>
-        </div>
-        
-        <div class="stat place-items-center">
-          <div class="stat-title text-xs">Carbs</div>
-          <div class="stat-value text-lg text-accent"><%= total_carbs.round(1) %></div>
-          <div class="stat-desc">grams</div>
-        </div>
-        
-        <div class="stat place-items-center">
-          <div class="stat-title text-xs">Fats</div>
-          <div class="stat-value text-lg text-warning"><%= total_fat.round(1) %></div>
-          <div class="stat-desc">grams</div>
-        </div>
-      </div>
+      <% end %>
     <% end %>
   </div>
 </div>
