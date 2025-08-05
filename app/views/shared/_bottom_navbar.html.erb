@@ -1,6 +1,6 @@
-<footer class="btm-nav fixed bottom-0 w-full z-50 bg-base-100 shadow-md flex flex-row items-stretch justify-center footer">
+<footer class="btm-nav fixed bottom-0 w-full max-w-full z-50 bg-base-100 shadow-md flex flex-row items-stretch justify-center footer overflow-x-hidden">
   <% if user_signed_in? %>
-  <div class="flex justify-center items-center w-full max-w-md mx-auto">
+  <div class="flex justify-center items-center w-full max-w-full mx-auto">
     <!-- Workout Plans (Left) -->
     <%= link_to workout_plans_path, class: "text-secondary flex flex-col items-center flex-1" do %>
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor"
