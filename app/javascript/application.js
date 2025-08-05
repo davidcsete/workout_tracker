@@ -1,7 +1,7 @@
 // Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
 import "@hotwired/turbo-rails"
 import "controllers"
-// import "page_transitions"
+import "page_transitions"
 // import "theme_persistence"
 // import "theme_handler"
 import { application } from "controllers/application"
