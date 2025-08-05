@@ -17,6 +17,50 @@
   padding: 0 !important;
   display: block !important;
 }
+
+/* Prevent horizontal scrolling on all elements */
+* {
+  box-sizing: border-box;
+}
+
+/* Ensure no element can cause horizontal overflow */
+body, html {
+  position: relative;
+  overflow-x: hidden !important;
+}
+
+/* Constrain all containers to viewport width */
+.container, main, .drawer, .drawer-content, .navbar {
+  max-width: 100vw;
+}
+
+/* Mobile-specific fixes */
+@media screen and (max-width: 768px) {
+  /* Force all elements to respect viewport boundaries */
+  * {
+    max-width: 100vw !important;
+  }
+  
+  /* Ensure fixed elements don't cause overflow */
+  .fixed, .absolute {
+    max-width: 100vw !important;
+  }
+  
+  /* Constrain the sidebar */
+  .drawer-side aside {
+    max-width: 80vw !important;
+  }
+  
+  /* Ensure grids don't overflow */
+  .grid {
+    max-width: 100% !important;
+  }
+  
+  /* Constrain canvas and video elements */
+  canvas, video {
+    max-width: 100% !important;
+  }
+}
  @keyframes slide-in-right {
     from { transform: translateX(100%); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
