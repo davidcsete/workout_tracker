@@ -9,7 +9,12 @@
 
   <%= render partial: "scanner" %>
 
-  <%= form_with(model: [@meal, @food_item], local: true, class: "space-y-4") do |form| %>
+  <% form_url = @meal.persisted? ? [@meal, @food_item] : food_items_path %>
+  <%= form_with(model: @food_item, url: form_url, local: true, class: "space-y-4") do |form| %>
+    <% unless @meal.persisted? %>
+      <%= hidden_field_tag :meal_type, @meal.meal_type %>
+    <% end %>
+    
     <div class="relative">
       <%= form.label :name, "Search Foods", class: "block font-medium" %>
       <%= form.text_field :name, 

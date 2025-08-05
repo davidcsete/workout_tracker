@@ -12,7 +12,16 @@ class FoodItemsController < ApplicationController
 
   # GET /food_items/new
   def new
-    @meal = Meal.find(params[:meal_id])
+    if params[:meal_id]
+      @meal = Meal.find(params[:meal_id])
+    else
+      # Create a new meal object for the form
+      @meal = Meal.new(
+        meal_type: params[:meal_type],
+        user: current_user,
+        consumed_at: Date.parse(params[:date])
+      )
+    end
     @food_item = FoodItem.new
     @date = Date.parse(params[:date])
   end
@@ -25,7 +34,23 @@ class FoodItemsController < ApplicationController
   def create
     @food_item = FoodItem.new(food_item_params)
     @food_item.food = Food.find(params[:food_item][:food_id]) if params[:food_item][:food_id].present?
-    @food_item.meal = Meal.find(params[:meal_id])
+
+    # Handle meal creation or finding
+    if params[:meal_id]
+      @food_item.meal = Meal.find(params[:meal_id])
+    else
+      # Find or create meal for the given date and meal type
+      consumed_date = Date.parse(params[:food_item][:consumed_at])
+      meal_type = params[:meal_type]
+
+      @food_item.meal = current_user.meals.where(
+        meal_type: meal_type,
+        consumed_at: consumed_date.all_day
+      ).first_or_create do |meal|
+        meal.consumed_at = consumed_date
+      end
+    end
+
     respond_to do |format|
       if @food_item.save
         if @food_item.food.nil? && !params[:food_item][:food_id].present?

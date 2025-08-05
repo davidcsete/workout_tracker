@@ -18,87 +18,87 @@
           Today's Nutrition Summary
         </h2>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-4 gap-1 sm:gap-3 md:gap-6">
           <!-- Calories -->
-          <div class="card bg-primary/5 border border-primary/20 shadow-sm">
-            <div class="card-body p-6 text-center">
-              <div class="text-sm font-semibold text-primary mb-2">Calories</div>
-              <div class="text-3xl font-bold text-primary mb-2">
+          <div class="card bg-primary/5 border border-primary/20 shadow-sm min-w-0">
+            <div class="card-body p-1 sm:p-3 text-center">
+              <div class="text-xs font-semibold text-primary mb-1 truncate">Calories</div>
+              <div class="text-sm sm:text-xl md:text-2xl font-bold text-primary mb-1 break-words">
                 <%= total_macros.total_calories.to_i %>
               </div>
               <% if diet_goal %>
-                <div class="text-xs text-primary/70 mb-3">
+                <div class="text-xs text-primary/70 mb-1 sm:mb-3 hidden sm:block">
                   Goal: <%= diet_goal.daily_calories %> kcal
                 </div>
-                <progress class="progress progress-primary w-full h-2" value="<%= [((total_macros.total_calories.to_f / diet_goal.daily_calories) * 100), 100].min %>" max="100"></progress>
-                <div class="text-xs text-primary/60 mt-1">
-                  <%= [((total_macros.total_calories.to_f / diet_goal.daily_calories) * 100), 100].min.round %>% of goal
+                <progress class="progress progress-primary w-full h-1 sm:h-2" value="<%= [((total_macros.total_calories.to_f / diet_goal.daily_calories) * 100), 100].min %>" max="100"></progress>
+                <div class="text-xs text-primary/60 mt-1 hidden sm:block">
+                  <%= [((total_macros.total_calories.to_f / diet_goal.daily_calories) * 100), 100].min.round %>%
                 </div>
               <% else %>
-                <div class="text-xs text-primary/70">kcal consumed</div>
+                <div class="text-xs text-primary/70 hidden sm:block">kcal</div>
               <% end %>
             </div>
           </div>
 
           <!-- Protein -->
-          <div class="card bg-secondary/5 border border-secondary/20 shadow-sm">
-            <div class="card-body p-6 text-center">
-              <div class="text-sm font-semibold text-secondary mb-2">Protein</div>
-              <div class="text-3xl font-bold text-secondary mb-2">
+          <div class="card bg-secondary/5 border border-secondary/20 shadow-sm min-w-0">
+            <div class="card-body p-1 sm:p-3 text-center">
+              <div class="text-xs font-semibold text-secondary mb-1 truncate">Protein</div>
+              <div class="text-sm sm:text-xl md:text-2xl font-bold text-secondary mb-1 break-words">
                 <%= total_macros.total_protein.to_f.round(1) %>g
               </div>
               <% if diet_goal %>
-                <div class="text-xs text-secondary/70 mb-3">
+                <div class="text-xs text-secondary/70 mb-1 sm:mb-3 hidden sm:block">
                   Goal: <%= diet_goal.protein_grams %>g
                 </div>
-                <progress class="progress progress-secondary w-full h-2" value="<%= [((total_macros.total_protein.to_f / diet_goal.protein_grams) * 100), 100].min %>" max="100"></progress>
-                <div class="text-xs text-secondary/60 mt-1">
-                  <%= [((total_macros.total_protein.to_f / diet_goal.protein_grams) * 100), 100].min.round %>% of goal
+                <progress class="progress progress-secondary w-full h-1 sm:h-2" value="<%= [((total_macros.total_protein.to_f / diet_goal.protein_grams) * 100), 100].min %>" max="100"></progress>
+                <div class="text-xs text-secondary/60 mt-1 hidden sm:block">
+                  <%= [((total_macros.total_protein.to_f / diet_goal.protein_grams) * 100), 100].min.round %>%
                 </div>
               <% else %>
-                <div class="text-xs text-secondary/70">grams consumed</div>
+                <div class="text-xs text-secondary/70 hidden sm:block">grams</div>
               <% end %>
             </div>
           </div>
 
           <!-- Carbs -->
-          <div class="card bg-accent/5 border border-accent/20 shadow-sm">
-            <div class="card-body p-6 text-center">
-              <div class="text-sm font-semibold text-accent mb-2">Carbs</div>
-              <div class="text-3xl font-bold text-accent mb-2">
+          <div class="card bg-accent/5 border border-accent/20 shadow-sm min-w-0">
+            <div class="card-body p-1 sm:p-3 text-center">
+              <div class="text-xs font-semibold text-accent mb-1 truncate">Carbs</div>
+              <div class="text-sm sm:text-xl md:text-2xl font-bold text-accent mb-1 break-words">
                 <%= total_macros.total_carbs.to_f.round(1) %>g
               </div>
               <% if diet_goal %>
-                <div class="text-xs text-accent/70 mb-3">
+                <div class="text-xs text-accent/70 mb-1 sm:mb-3 hidden sm:block">
                   Goal: <%= diet_goal.carb_grams %>g
                 </div>
-                <progress class="progress progress-accent w-full h-2" value="<%= [((total_macros.total_carbs.to_f / diet_goal.carb_grams) * 100), 100].min %>" max="100"></progress>
-                <div class="text-xs text-accent/60 mt-1">
-                  <%= [((total_macros.total_carbs.to_f / diet_goal.carb_grams) * 100), 100].min.round %>% of goal
+                <progress class="progress progress-accent w-full h-1 sm:h-2" value="<%= [((total_macros.total_carbs.to_f / diet_goal.carb_grams) * 100), 100].min %>" max="100"></progress>
+                <div class="text-xs text-accent/60 mt-1 hidden sm:block">
+                  <%= [((total_macros.total_carbs.to_f / diet_goal.carb_grams) * 100), 100].min.round %>%
                 </div>
               <% else %>
-                <div class="text-xs text-accent/70">grams consumed</div>
+                <div class="text-xs text-accent/70 hidden sm:block">grams</div>
               <% end %>
             </div>
           </div>
 
           <!-- Fats -->
-          <div class="card bg-warning/5 border border-warning/20 shadow-sm">
-            <div class="card-body p-6 text-center">
-              <div class="text-sm font-semibold text-warning mb-2">Fats</div>
-              <div class="text-3xl font-bold text-warning mb-2">
+          <div class="card bg-warning/5 border border-warning/20 shadow-sm min-w-0">
+            <div class="card-body p-1 sm:p-3 text-center">
+              <div class="text-xs font-semibold text-warning mb-1 truncate">Fats</div>
+              <div class="text-sm sm:text-xl md:text-2xl font-bold text-warning mb-1 break-words">
                 <%= total_macros.total_fats.to_f.round(1) %>g
               </div>
               <% if diet_goal %>
-                <div class="text-xs text-warning/70 mb-3">
+                <div class="text-xs text-warning/70 mb-1 sm:mb-3 hidden sm:block">
                   Goal: <%= diet_goal.fat_grams %>g
                 </div>
-                <progress class="progress progress-warning w-full h-2" value="<%= [((total_macros.total_fats.to_f / diet_goal.fat_grams) * 100), 100].min %>" max="100"></progress>
-                <div class="text-xs text-warning/60 mt-1">
-                  <%= [((total_macros.total_fats.to_f / diet_goal.fat_grams) * 100), 100].min.round %>% of goal
+                <progress class="progress progress-warning w-full h-1 sm:h-2" value="<%= [((total_macros.total_fats.to_f / diet_goal.fat_grams) * 100), 100].min %>" max="100"></progress>
+                <div class="text-xs text-warning/60 mt-1 hidden sm:block">
+                  <%= [((total_macros.total_fats.to_f / diet_goal.fat_grams) * 100), 100].min.round %>%
                 </div>
               <% else %>
-                <div class="text-xs text-warning/70">grams consumed</div>
+                <div class="text-xs text-warning/70 hidden sm:block">grams</div>
               <% end %>
             </div>
           </div>
