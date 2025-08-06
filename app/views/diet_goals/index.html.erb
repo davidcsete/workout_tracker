@@ -1,6 +1,6 @@
 <div class="max-w-4xl mx-auto mt-10 p-6">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold">Your Nutrition Goals</h1>
+  <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
+    <h1 class="text-3xl font-bold mb-4 md:mb-0">Your Nutrition Goals</h1>
     <div class="flex gap-2">
       <%= link_to "Edit Goals", edit_diet_goal_path(@diet_goal), class: "btn btn-primary" %>
       <%= link_to "Regenerate", regenerate_diet_goal_path(@diet_goal), method: :patch, 
