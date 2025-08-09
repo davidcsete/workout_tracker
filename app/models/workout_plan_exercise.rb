@@ -15,5 +15,11 @@ class WorkoutPlanExercise < ApplicationRecord
     saturday: 6
   }
 
-  default_scope { order(:day_of_the_week, :order) }
+  # Custom ordering: Monday first (1), Sunday last (0)
+  default_scope {
+    order(
+      Arel.sql("CASE day_of_the_week WHEN 1 THEN 1 WHEN 2 THEN 2 WHEN 3 THEN 3 WHEN 4 THEN 4 WHEN 5 THEN 5 WHEN 6 THEN 6 WHEN 0 THEN 7 END"),
+      :order
+    )
+  }
 end

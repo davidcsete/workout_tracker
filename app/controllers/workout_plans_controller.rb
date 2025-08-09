@@ -25,6 +25,7 @@ class WorkoutPlansController < ApplicationController
 
   # GET /workout_plans/1 or /workout_plans/1.json
   def show
+    @is_owner = @workout_plan.user_id == current_user.id
   end
 
   # GET /workout_plans/new
@@ -34,6 +35,7 @@ class WorkoutPlansController < ApplicationController
 
   # GET /workout_plans/1/edit
   def edit
+    @workout_plan = current_user.workout_plans.includes(workout_plan_exercises: { exercise: :exercise_trackings }).find(params.expect(:id))
   end
 
   # POST /workout_plans or /workout_plans.json
