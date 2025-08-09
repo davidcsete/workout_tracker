@@ -18,7 +18,7 @@
           <div class="avatar placeholder">
             <div class="bg-neutral text-neutral-content rounded-full w-6 h-6 relative">
               <span class="absolute inset-0 flex items-center justify-center text-xs font-medium leading-none">
-                <%= workout_plan.user.username.first.upcase %>
+                <%= workout_plan.user&.username&.first&.upcase %>
               </span>
             </div>
           </div>

@@ -23,9 +23,9 @@ console_command = '/rails/bin/rails console'
   processes = ['app']
 
   [[http_service.checks]]
-    interval = '15s'
-    timeout = '10s'
-    grace_period = '30s'
+    interval = '5s'
+    timeout = '5s'
+    grace_period = '10s'
     method = 'GET'
     path = '/up'
     protocol = 'http'

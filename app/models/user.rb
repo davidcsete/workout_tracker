@@ -11,4 +11,8 @@ class User < ApplicationRecord
   has_many :meals, dependent: :destroy
 
   accepts_nested_attributes_for :user_detail, allow_destroy: true
+
+  validates :username, presence: true, uniqueness: { case_sensitive: false },
+            length: { minimum: 3, maximum: 20 },
+            format: { with: /\A[a-zA-Z0-9_]+\z/, message: "can only contain letters, numbers, and underscores" }
 end
