@@ -11,11 +11,21 @@
           <%= render "devise/shared/error_messages", resource: resource %>
 
           <div class="form-control">
+            <%= f.label :username, class: "label" do %>
+              <span class="label-text font-medium">Username</span>
+            <% end %>
+            <%= f.text_field :username, 
+                autofocus: true, 
+                autocomplete: "username",
+                class: "input input-bordered w-full",
+                placeholder: "Choose a username" %>
+          </div>
+
+          <div class="form-control">
             <%= f.label :email, class: "label" do %>
               <span class="label-text font-medium">Email address</span>
             <% end %>
             <%= f.email_field :email, 
-                autofocus: true, 
                 autocomplete: "email",
                 class: "input input-bordered w-full",
                 placeholder: "Enter your email" %>

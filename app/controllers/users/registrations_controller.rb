@@ -1,4 +1,5 @@
 class Users::RegistrationsController < Devise::RegistrationsController
+  before_action :configure_sign_up_params, only: [ :create ]
   before_action :configure_account_update_params, only: [ :update ]
 
   def update
@@ -32,8 +33,13 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   protected
 
+  def configure_sign_up_params
+    devise_parameter_sanitizer.permit(:sign_up, keys: [ :username ])
+  end
+
   def configure_account_update_params
     devise_parameter_sanitizer.permit(:account_update, keys: [
+      :username,
       user_detail_attributes: [ :id, :age, :bodyweight, :goal_id, :lifestyle_id ]
     ])
   end
