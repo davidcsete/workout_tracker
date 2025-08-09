@@ -8,12 +8,14 @@
     <!-- Card Header -->
     <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
       <div class="flex-1 min-w-0">
-        <h2 class="card-title text-lg sm:text-xl mb-2 leading-tight">
-          <span class="truncate"><%= workout_plan.name %></span>
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+          <h2 class="card-title text-lg sm:text-xl leading-tight min-w-0">
+            <span class="truncate"><%= workout_plan.name %></span>
+          </h2>
           <% if is_owner %>
-            <div class="badge badge-primary badge-sm">Your Plan</div>
+            <div class="badge badge-primary badge-xs sm:badge-sm flex-shrink-0">Your Plan</div>
           <% end %>
-        </h2>
+        </div>
         <div class="flex items-center gap-2 text-sm opacity-70">
           <div class="avatar placeholder">
             <div class="bg-neutral text-neutral-content rounded-full w-6 h-6 relative">
