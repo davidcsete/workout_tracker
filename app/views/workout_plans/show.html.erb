@@ -1,11 +1,8 @@
 <% content_for :title, "Showing workout plan" %>
 
 <div class="md:w-2/3 w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
 
   <h1 class="font-bold text-4xl">Showing workout plan</h1>
   <%= link_to "Back to workout plans", workout_plans_path, class: "w-full sm:w-auto text-center mt-2 mb-2 rounded-md px-3.5 py-2.5 btn btn-info inline-block font-medium" %>
-  <%= render @workout_plan %>
+  <%= render @workout_plan, is_owner: @is_owner %>
 </div>
