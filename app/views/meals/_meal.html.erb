@@ -1,4 +1,7 @@
-<div class="card bg-base-100 shadow-xl border-l-4 border-l-primary mb-6" <% if meal.persisted? %>id="<%= dom_id(meal) %>"<% end %>>
+<div class="card bg-base-100 shadow-xl border-l-4 border-l-primary mb-6" 
+     <% if meal.persisted? %>id="<%= dom_id(meal) %>"<% end %>
+     data-controller="card-animation"
+     data-card-animation-target="card">
   <div class="card-body">
     <!-- Meal Header -->
     <div class="flex justify-between items-center mb-4">

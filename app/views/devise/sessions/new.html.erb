@@ -4,7 +4,7 @@
       <h1 class="text-5xl font-bold">Login now!</h1>
       <p class="py-6">Welcome back! Please sign in to your account to continue.</p>
     </div>
-    <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+    <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100" data-controller="card-animation">
       <div class="card-body">
         <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
           <div class="form-control">

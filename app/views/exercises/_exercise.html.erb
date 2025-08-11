@@ -1,6 +1,8 @@
 <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 border border-base-300 hover:border-primary/30 overflow-hidden touch-manipulation w-full"
      data-exercise-id="<%= exercise.id %>"
      data-workout-exercises-target="exerciseCard"
+     data-controller="card-animation"
+     data-card-animation-target="card"
      draggable="true"
      data-action="dragstart->workout-exercises#startDrag dragend->workout-exercises#endDrag"
      ondragover="event.preventDefault()"
