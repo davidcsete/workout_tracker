@@ -55,6 +55,9 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  # Load environment variables from .env file
+  gem "dotenv-rails"
 end
 
 group :development do
@@ -70,9 +73,12 @@ group :test do
 end
 
 gem "devise", "~> 4.9"
+gem "omniauth", "~> 2.1"
+gem "omniauth-google-oauth2", "~> 1.1"
+gem "omniauth-rails_csrf_protection", "~> 1.0"
 
 gem "rspec-rails", "~> 7.1", groups: [ :development, :test ]
 
 gem "byebug", "~> 12.0", groups: [ :development, :test ]
 
-gem "dockerfile-rails", ">= 1.7", :group => :development
+gem "dockerfile-rails", ">= 1.7", group: :development

@@ -88,7 +88,7 @@ production:
     database: workout_tracker_production
     username: workout_tracker
     password: <%= ENV["WORKOUT_TRACKER_DATABASE_PASSWORD"] %>
-    url: <%= ENV["DATABASE_URL"] %>
+    url: <%= ENV["DATABASE_URL"] if Rails.env.production? %>
   cache:
     <<: *primary_production
     database: workout_tracker_production_cache

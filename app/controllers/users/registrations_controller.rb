@@ -45,10 +45,14 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
   def update_resource(resource, params)
-    # Remove password params if they're blank
+    # For OAuth users or when password fields are blank, update without password
     if params[:password].blank? && params[:password_confirmation].blank?
       params.delete(:password)
       params.delete(:password_confirmation)
+      params.delete(:current_password)
+      resource.update_without_password(params)
+    elsif resource.provider.present?
+      # OAuth users don't need current password for updates
       params.delete(:current_password)
       resource.update_without_password(params)
     else

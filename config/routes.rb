@@ -21,7 +21,8 @@ Rails.application.routes.draw do
   resources :exercises
   root to: "home#index"
   devise_for :users, controllers: {
-    registrations: "users/registrations"
+    registrations: "users/registrations",
+    omniauth_callbacks: "users/omniauth_callbacks"
   }
   resources :workout_plans do
     member do
