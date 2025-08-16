@@ -45,6 +45,7 @@ Rails.application.routes.draw do
   namespace :api do
     resources :exercise_trackings, only: [ :index ]
     resources :barcodes, only: [ :index ]
+    resources :foods, only: [ :index, :create ]
   end
   get "dashboard", to: "dashboard#index"
   post "/chatbots", to: "chatbots#create"

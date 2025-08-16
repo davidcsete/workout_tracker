@@ -1,0 +1,92 @@
+<!-- Ingredients Card -->
+<div class="card bg-base-100 shadow-lg transition-all duration-500 ease-out hover:shadow-xl animate-fade-in-up">
+  <div class="card-body">
+    <h2 class="card-title text-xl mb-4 transition-all duration-600 ease-out">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h2m0 0h2m-2 0v6a2 2 0 002 2h6a2 2 0 002-2v-6a2 2 0 00-2-2h-6a2 2 0 00-2 2zm2-2V7a2 2 0 012-2h2a2 2 0 012 2v2"></path>
+      </svg>
+      Ingredients
+      <span class="text-sm font-normal text-base-content/60 ml-2">(search or create new foods)</span>
+    </h2>
+    
+    <div id="ingredients-container" class="space-y-3">
+      <% if defined?(recipe_ingredients) && recipe_ingredients.any? %>
+        <% recipe_ingredients.each_with_index do |ingredient, index| %>
+          <div class="ingredient-row grid grid-cols-1 md:grid-cols-4 gap-3 p-4 bg-base-200 rounded-lg">
+            <div class="form-control relative">
+              <input type="hidden" name="recipe_ingredients[][food_id]" value="<%= ingredient.food_id %>" class="food-id-input">
+              <input type="text" 
+                     class="input input-bordered food-search-input" 
+                     placeholder="Search for food..." 
+                     value="<%= ingredient.food.name %>"
+                     autocomplete="off"
+                     required>
+              <div class="food-suggestions absolute top-full left-0 right-0 bg-base-100 border border-base-300 rounded-lg shadow-lg z-50 hidden max-h-60 overflow-y-auto"></div>
+            </div>
+            <div class="form-control">
+              <input type="number" name="recipe_ingredients[][quantity]" placeholder="Quantity" step="0.1" min="0" value="<%= ingredient.quantity %>" class="input input-bordered" required>
+            </div>
+            <div class="form-control">
+              <select name="recipe_ingredients[][unit]" class="select select-bordered">
+                <% RecipeIngredient::UNITS.each do |unit| %>
+                  <option value="<%= unit %>" <%= 'selected' if unit == ingredient.unit %>><%= unit.humanize %></option>
+                <% end %>
+              </select>
+            </div>
+            <div class="form-control">
+              <button type="button" class="btn btn-error remove-ingredient">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                Remove
+              </button>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="ingredient-row grid grid-cols-1 md:grid-cols-4 gap-3 p-4 bg-base-200 rounded-lg">
+          <div class="form-control relative">
+            <input type="hidden" name="recipe_ingredients[][food_id]" value="" class="food-id-input">
+            <input type="text" 
+                   class="input input-bordered food-search-input" 
+                   placeholder="Search for food..." 
+                   autocomplete="off"
+                   required>
+            <div class="food-suggestions absolute top-full left-0 right-0 bg-base-100 border border-base-300 rounded-lg shadow-lg z-50 hidden max-h-60 overflow-y-auto"></div>
+          </div>
+          <div class="form-control">
+            <input type="number" name="recipe_ingredients[][quantity]" placeholder="Quantity" step="0.1" min="0" class="input input-bordered" required>
+          </div>
+          <div class="form-control">
+            <select name="recipe_ingredients[][unit]" class="select select-bordered">
+              <% RecipeIngredient::UNITS.each do |unit| %>
+                <option value="<%= unit %>" <%= 'selected' if unit == 'grams' %>><%= unit.humanize %></option>
+              <% end %>
+            </select>
+          </div>
+          <div class="form-control">
+            <button type="button" class="btn btn-error remove-ingredient">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+              Remove
+            </button>
+            </div>
+        </div>
+      <% end %>
+    </div>
+    
+    <div class="card-actions justify-start mt-4">
+      <button type="button" id="add-ingredient" class="btn btn-success">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+        Add Ingredient
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+<%= render 'recipes/searchable_ingredients_script' %>

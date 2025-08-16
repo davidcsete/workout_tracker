@@ -1,0 +1,588 @@
+<style>
+.food-suggestions {
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 2147483647 !important;
+  position: absolute !important;
+  background: white !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.food-suggestion-item {
+  padding: 12px;
+  cursor: pointer;
+  border-bottom: 1px solid hsl(var(--b3));
+  transition: background-color 0.2s ease;
+}
+
+.food-suggestion-item:hover {
+  background-color: hsl(var(--b2));
+}
+
+.food-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.create-new-food {
+  background-color: hsl(var(--p) / 0.1);
+  color: hsl(var(--p));
+  font-weight: 600;
+}
+
+.create-new-food:hover {
+  background-color: hsl(var(--p) / 0.2);
+}
+
+.nutrition-info {
+  font-size: 0.75rem;
+  color: hsl(var(--bc) / 0.6);
+  margin-top: 2px;
+}
+
+/* Force modal to be above everything */
+#create-food-modal {
+  z-index: 2147483647 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(4px) !important;
+  isolation: isolate !important;
+}
+
+#create-food-modal > div {
+  z-index: 2147483647 !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  isolation: isolate !important;
+}
+
+/* Reset any stacking contexts that might interfere */
+.card, .container, main, body, html {
+  isolation: auto !important;
+}
+
+/* Ensure parent containers don't clip the dropdown */
+.card, .card-body, .form-control {
+  overflow: visible !important;
+}
+
+/* Force the ingredients container to not clip */
+#ingredients-container {
+  overflow: visible !important;
+}
+
+/* Make sure the ingredient rows don't clip */
+.ingredient-row {
+  overflow: visible !important;
+}
+
+/* Reset stacking context for animated elements */
+.animate-fade-in-up {
+  isolation: auto !important;
+  transform: none !important;
+}
+
+/* Specifically target the instructions card */
+.card.animate-fade-in-up {
+  z-index: 1 !important;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const container = document.getElementById('ingredients-container');
+  const addButton = document.getElementById('add-ingredient');
+  
+  // Create custom modal dynamically and append to body
+  const modalHTML = `
+    <div id="create-food-modal" style="
+      display: none;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background-color: rgba(0, 0, 0, 0.5) !important;
+      z-index: 999999 !important;
+      backdrop-filter: blur(4px);
+    ">
+      <div style="
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        background: white !important;
+        border-radius: 12px !important;
+        padding: 24px !important;
+        max-width: 500px !important;
+        width: 90vw !important;
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+        z-index: 999999 !important;
+      ">
+        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 16px; color: #1f2937;">Create New Food</h3>
+        <form id="create-food-form" style="display: flex; flex-direction: column; gap: 16px;">
+          <div>
+            <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #374151;">Food Name</label>
+            <input type="text" id="new-food-name" required style="
+              width: 100%;
+              padding: 8px 12px;
+              border: 1px solid #d1d5db;
+              border-radius: 6px;
+              font-size: 14px;
+            ">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div>
+              <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #374151;">Calories (per 100g)</label>
+              <input type="number" id="new-food-calories" step="0.1" min="0" required style="
+                width: 100%;
+                padding: 8px 12px;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                font-size: 14px;
+              ">
+            </div>
+            <div>
+              <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #374151;">Protein (g per 100g)</label>
+              <input type="number" id="new-food-protein" step="0.1" min="0" required style="
+                width: 100%;
+                padding: 8px 12px;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                font-size: 14px;
+              ">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div>
+              <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #374151;">Carbs (g per 100g)</label>
+              <input type="number" id="new-food-carbs" step="0.1" min="0" required style="
+                width: 100%;
+                padding: 8px 12px;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                font-size: 14px;
+              ">
+            </div>
+            <div>
+              <label style="display: block; margin-bottom: 4px; font-weight: 500; color: #374151;">Fats (g per 100g)</label>
+              <input type="number" id="new-food-fats" step="0.1" min="0" required style="
+                width: 100%;
+                padding: 8px 12px;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                font-size: 14px;
+              ">
+            </div>
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px;">
+            <button type="button" id="cancel-modal" style="
+              padding: 8px 16px;
+              background: #f3f4f6;
+              color: #374151;
+              border: none;
+              border-radius: 6px;
+              cursor: pointer;
+              font-size: 14px;
+            ">Cancel</button>
+            <button type="submit" style="
+              padding: 8px 16px;
+              background: #3b82f6;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              cursor: pointer;
+              font-size: 14px;
+            ">Create Food</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+  
+  const createFoodModal = document.getElementById('create-food-modal');
+  const createFoodForm = document.getElementById('create-food-form');
+  
+  // Add cancel button functionality
+  document.getElementById('cancel-modal').addEventListener('click', () => {
+    createFoodModal.style.display = 'none';
+    createFoodForm.reset();
+    currentSearchInput = null;
+  });
+  
+  // Close modal when clicking outside
+  createFoodModal.addEventListener('click', (e) => {
+    if (e.target === createFoodModal) {
+      createFoodModal.style.display = 'none';
+      createFoodForm.reset();
+      currentSearchInput = null;
+    }
+  });
+  
+  let currentSearchInput = null;
+  let searchTimeout = null;
+  
+  // Function to show modal with forced styling
+  function showCreateFoodModal(query) {
+    console.log('showCreateFoodModal called with query:', query);
+    console.log('createFoodModal element:', createFoodModal);
+    
+    if (!createFoodModal) {
+      console.error('createFoodModal element not found!');
+      return;
+    }
+    
+    document.getElementById('new-food-name').value = query;
+    createFoodModal.style.display = 'block';
+    
+    // Force modal to be visible and on top with a slight delay
+    setTimeout(() => {
+      createFoodModal.style.zIndex = '2147483647';
+      createFoodModal.style.position = 'fixed';
+      createFoodModal.style.top = '0';
+      createFoodModal.style.left = '0';
+      createFoodModal.style.width = '100vw';
+      createFoodModal.style.height = '100vh';
+      createFoodModal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+      
+      // Also force the modal content
+      const modalContent = createFoodModal.firstElementChild;
+      if (modalContent) {
+        modalContent.style.zIndex = '2147483647';
+        modalContent.style.position = 'absolute';
+        modalContent.style.top = '50%';
+        modalContent.style.left = '50%';
+        modalContent.style.transform = 'translate(-50%, -50%)';
+        modalContent.style.backgroundColor = 'white';
+        modalContent.style.borderRadius = '12px';
+        modalContent.style.padding = '24px';
+        modalContent.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.25)';
+      }
+      
+      console.log('Modal forced to top with z-index:', createFoodModal.style.zIndex);
+      console.log('Modal display style:', createFoodModal.style.display);
+    }, 10);
+  }
+
+  // Initialize existing search inputs
+  initializeSearchInputs();
+
+  function initializeSearchInputs() {
+    container.querySelectorAll('.food-search-input').forEach(input => {
+      setupFoodSearch(input);
+    });
+  }
+
+  function setupFoodSearch(input) {
+    const suggestionsDiv = input.nextElementSibling;
+    const hiddenInput = input.parentElement.querySelector('.food-id-input');
+
+    input.addEventListener('input', function() {
+      const query = this.value.trim();
+      
+      // Clear previous timeout
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+      
+      // Clear hidden input if user is typing
+      hiddenInput.value = '';
+      
+      if (query.length < 2) {
+        hideSuggestions(suggestionsDiv);
+        return;
+      }
+
+      // Debounce search
+      searchTimeout = setTimeout(() => {
+        searchFoods(query, suggestionsDiv, input, hiddenInput);
+      }, 300);
+    });
+
+    input.addEventListener('blur', function() {
+      // Delay hiding to allow clicking on suggestions
+      setTimeout(() => {
+        hideSuggestions(suggestionsDiv);
+      }, 200);
+    });
+
+    input.addEventListener('focus', function() {
+      if (this.value.length >= 2) {
+        searchFoods(this.value.trim(), suggestionsDiv, input, hiddenInput);
+      }
+    });
+  }
+
+  async function searchFoods(query, suggestionsDiv, input, hiddenInput) {
+    try {
+      const response = await fetch(`/api/foods?q=${encodeURIComponent(query)}`, {
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      });
+      
+      if (!response.ok) throw new Error('Search failed');
+      
+      const foods = await response.json();
+      displaySuggestions(foods, query, suggestionsDiv, input, hiddenInput);
+    } catch (error) {
+      console.error('Food search error:', error);
+      hideSuggestions(suggestionsDiv);
+    }
+  }
+
+  function displaySuggestions(foods, query, suggestionsDiv, input, hiddenInput) {
+    suggestionsDiv.innerHTML = '';
+    
+    if (foods.length === 0) {
+      // Show create new food option
+      const createOption = document.createElement('div');
+      createOption.className = 'food-suggestion-item create-new-food';
+      createOption.innerHTML = `
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          <span>Create new food: "<strong>${query}</strong>"</span>
+        </div>
+      `;
+      createOption.addEventListener('click', () => {
+        currentSearchInput = input;
+        showCreateFoodModal(query);
+        hideSuggestions(suggestionsDiv);
+      });
+      suggestionsDiv.appendChild(createOption);
+    } else {
+      // Show existing foods
+      foods.forEach(food => {
+        const item = document.createElement('div');
+        item.className = 'food-suggestion-item';
+        item.innerHTML = `
+          <div>
+            <div class="font-medium">${food.name}</div>
+            <div class="nutrition-info">
+              ${food.calories} kcal, ${food.protein}g P, ${food.carbs}g C, ${food.fats}g F (per 100g)
+            </div>
+          </div>
+        `;
+        item.addEventListener('click', () => {
+          selectFood(food, input, hiddenInput);
+          hideSuggestions(suggestionsDiv);
+        });
+        suggestionsDiv.appendChild(item);
+      });
+      
+      // Add create new option at the end
+      const createOption = document.createElement('div');
+      createOption.className = 'food-suggestion-item create-new-food';
+      createOption.innerHTML = `
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          <span>Create new food: "<strong>${query}</strong>"</span>
+        </div>
+      `;
+      createOption.addEventListener('click', () => {
+        currentSearchInput = input;
+        showCreateFoodModal(query);
+        hideSuggestions(suggestionsDiv);
+      });
+      suggestionsDiv.appendChild(createOption);
+    }
+    
+    showSuggestions(suggestionsDiv);
+  }
+
+  function selectFood(food, input, hiddenInput) {
+    input.value = food.name;
+    hiddenInput.value = food.id;
+  }
+
+  function showSuggestions(suggestionsDiv) {
+    suggestionsDiv.classList.remove('hidden');
+    
+    // Get the input element to calculate position
+    const input = suggestionsDiv.previousElementSibling;
+    if (input) {
+      const rect = input.getBoundingClientRect();
+      
+      // Store original parent for later restoration
+      suggestionsDiv.originalParent = suggestionsDiv.parentElement;
+      
+      // Move to body and position absolutely
+      document.body.appendChild(suggestionsDiv);
+      
+      suggestionsDiv.style.position = 'fixed';
+      suggestionsDiv.style.top = (rect.bottom + window.scrollY) + 'px';
+      suggestionsDiv.style.left = rect.left + 'px';
+      suggestionsDiv.style.width = rect.width + 'px';
+      suggestionsDiv.style.zIndex = '2147483647';
+      suggestionsDiv.style.maxHeight = '240px';
+      suggestionsDiv.style.overflowY = 'auto';
+      suggestionsDiv.style.backgroundColor = 'white';
+      suggestionsDiv.style.border = '1px solid #d1d5db';
+      suggestionsDiv.style.borderRadius = '8px';
+      suggestionsDiv.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
+    }
+  }
+
+  function hideSuggestions(suggestionsDiv) {
+    suggestionsDiv.classList.add('hidden');
+    
+    // Move back to original parent if it was moved to body
+    if (suggestionsDiv.originalParent && suggestionsDiv.parentElement === document.body) {
+      suggestionsDiv.originalParent.appendChild(suggestionsDiv);
+      
+      // Reset styles
+      suggestionsDiv.style.position = 'absolute';
+      suggestionsDiv.style.top = '100%';
+      suggestionsDiv.style.left = '0';
+      suggestionsDiv.style.right = '0';
+      suggestionsDiv.style.width = 'auto';
+      suggestionsDiv.style.zIndex = '';
+      suggestionsDiv.style.maxHeight = '';
+      suggestionsDiv.style.overflowY = '';
+      suggestionsDiv.style.backgroundColor = '';
+      suggestionsDiv.style.border = '';
+      suggestionsDiv.style.borderRadius = '';
+      suggestionsDiv.style.boxShadow = '';
+    }
+  }
+
+  // Create food form submission
+  if (createFoodForm) {
+    createFoodForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = {
+      food: {
+        name: document.getElementById('new-food-name').value,
+        calories: parseFloat(document.getElementById('new-food-calories').value),
+        protein: parseFloat(document.getElementById('new-food-protein').value),
+        carbs: parseFloat(document.getElementById('new-food-carbs').value),
+        fats: parseFloat(document.getElementById('new-food-fats').value)
+      }
+    };
+
+    try {
+      const response = await fetch('/api/foods', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.errors?.join(', ') || 'Failed to create food');
+      }
+
+      const newFood = await response.json();
+      
+      // Select the newly created food
+      if (currentSearchInput) {
+        const hiddenInput = currentSearchInput.parentElement.querySelector('.food-id-input');
+        selectFood(newFood, currentSearchInput, hiddenInput);
+      }
+      
+      // Close modal and reset form
+      createFoodModal.style.display = 'none';
+      createFoodForm.reset();
+      currentSearchInput = null;
+      
+      // Show success message
+      showToast('Food created successfully!', 'success');
+      
+    } catch (error) {
+      console.error('Create food error:', error);
+      showToast(error.message, 'error');
+    }
+    });
+  }
+
+  // Add ingredient button
+  addButton.addEventListener('click', function() {
+    const template = container.querySelector('.ingredient-row');
+    const newRow = template.cloneNode(true);
+    
+    // Clear all inputs
+    newRow.querySelectorAll('input').forEach(input => {
+      if (input.type === 'hidden') {
+        input.value = '';
+      } else if (input.type === 'number') {
+        input.value = '';
+      } else if (input.type === 'text') {
+        input.value = '';
+      }
+    });
+    
+    // Reset unit to grams
+    const unitSelect = newRow.querySelector('select[name*="unit"]');
+    if (unitSelect) {
+      unitSelect.value = 'grams';
+    }
+    
+    // Setup search for new input
+    const searchInput = newRow.querySelector('.food-search-input');
+    setupFoodSearch(searchInput);
+    
+    container.appendChild(newRow);
+    
+    // Focus on the new search input
+    searchInput.focus();
+  });
+
+  // Remove ingredient
+  container.addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-ingredient') || e.target.closest('.remove-ingredient')) {
+      if (container.querySelectorAll('.ingredient-row').length > 1) {
+        const row = e.target.closest('.ingredient-row');
+        if (row) row.remove();
+      }
+    }
+  });
+
+  // Toast notification function
+  function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type} fixed top-4 right-4 w-auto max-w-sm z-50 shadow-lg`;
+    toast.innerHTML = `
+      <svg class="w-6 h-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <span>${message}</span>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
+  }
+
+  // Close suggestions when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.form-control')) {
+      container.querySelectorAll('.food-suggestions').forEach(div => {
+        hideSuggestions(div);
+      });
+    }
+  });
+});
+</script>
