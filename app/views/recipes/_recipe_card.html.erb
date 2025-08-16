@@ -1,0 +1,89 @@
+<div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-500 ease-out hover:scale-105 border-l-4 border-l-primary animate-fade-in-up">
+  <div class="card-body p-4 sm:p-6">
+    <!-- Header with title and copy button - Mobile optimized -->
+    <div class="mb-3">
+      <!-- Title on its own line for mobile -->
+      <div class="flex justify-between items-start gap-2 mb-2">
+        <h3 class="card-title text-base sm:text-lg font-bold leading-tight flex-1 min-w-0">
+          <%= link_to recipe.name, recipe_path(recipe), class: "hover:text-primary transition-colors block truncate" %>
+        </h3>
+        <% if show_copy && recipe.can_be_copied_by?(current_user) %>
+          <% unless recipe.copied_by?(current_user) %>
+            <%= link_to copy_recipe_path(recipe), method: :post, 
+                class: "btn btn-success btn-xs shrink-0",
+                data: { confirm: "Copy this recipe to your collection?" } do %>
+              <svg class="w-3 h-3 sm:mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+              </svg>
+              <span class="hidden sm:inline">Copy</span>
+            <% end %>
+          <% else %>
+            <div class="badge badge-neutral badge-sm">Copied</div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Description -->
+    <% if recipe.description.present? %>
+      <p class="text-base-content/70 text-sm mb-4 line-clamp-2"><%= recipe.description %></p>
+    <% end %>
+
+    <!-- Recipe meta info - Mobile optimized -->
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
+      <div class="flex items-center gap-2">
+        <div class="avatar">
+          <div class="bg-neutral text-neutral-content rounded-full w-6 h-6 sm:w-8 sm:h-8 text-xs font-medium" style="display: flex; align-items: center; justify-content: center; text-align: center;">
+            <%= recipe.user.email.first.upcase %>
+          </div>
+        </div>
+        <span class="text-xs sm:text-sm text-base-content/70">By <%= recipe.user.email.split('@').first %></span>
+      </div>
+      <div class="badge badge-outline badge-sm">
+        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+        </svg>
+        <%= recipe.servings %> serving<%= 's' if recipe.servings != 1 %>
+      </div>
+    </div>
+
+    <!-- Nutrition stats - Mobile optimized -->
+    <div class="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
+      <div class="stat bg-base-200 rounded-lg p-2 sm:p-3">
+        <div class="stat-title text-xs">Calories</div>
+        <div class="stat-value text-sm sm:text-base text-primary"><%= recipe.per_serving_calories.round(1) %></div>
+      </div>
+      <div class="stat bg-base-200 rounded-lg p-2 sm:p-3">
+        <div class="stat-title text-xs">Protein</div>
+        <div class="stat-value text-sm sm:text-base text-secondary"><%= recipe.per_serving_protein.round(1) %>g</div>
+      </div>
+    </div>
+
+    <!-- Time info -->
+    <% if recipe.total_time_minutes > 0 %>
+      <div class="flex items-center gap-2 mb-4 text-sm text-base-content/70">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span><%= recipe.total_time_minutes %> minutes</span>
+      </div>
+    <% end %>
+
+    <!-- Action buttons - Mobile optimized -->
+    <div class="card-actions justify-end gap-1 sm:gap-2">
+      <%= link_to recipe_path(recipe), class: "btn btn-primary btn-xs sm:btn-sm flex-1" do %>
+        <svg class="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+        </svg>
+        <span class="text-xs sm:text-sm">View</span>
+      <% end %>
+      <%= link_to add_to_meal_recipe_path(recipe), class: "btn btn-accent btn-xs sm:btn-sm flex-1" do %>
+        <svg class="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+        <span class="text-xs sm:text-sm">Add to Meal</span>
+      <% end %>
+    </div>
+  </div>
+</div>

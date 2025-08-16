@@ -71,22 +71,33 @@
             <div class="card-body p-4">
               <div class="flex justify-between items-start">
                 <div class="flex-1">
-                  <h3 class="font-semibold text-lg"><%= item.name %></h3>
-                  <p class="text-sm text-base-content/70 mb-2"><%= item.grams %>g serving</p>
+                  <div class="flex items-center gap-2 mb-1">
+                    <h3 class="font-semibold text-lg"><%= item.name %></h3>
+                    <% if item.recipe.present? %>
+                      <div class="badge badge-info badge-sm">Recipe</div>
+                    <% end %>
+                  </div>
+                  <p class="text-sm text-base-content/70 mb-2">
+                    <% if item.recipe.present? && item.recipe_servings.present? %>
+                      <%= item.recipe_servings %> serving<%= 's' if item.recipe_servings != 1 %> • <%= item.grams %>g
+                    <% else %>
+                      <%= item.grams %>g serving
+                    <% end %>
+                  </p>
                   
                   <!-- Nutrition Info -->
                   <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
                     <div class="badge badge-primary badge-outline">
-                      <%= item.calories %> kcal
+                      <%= item.calories.round(1) %> kcal
                     </div>
                     <div class="badge badge-secondary badge-outline">
-                      <%= item.protein %>g P
+                      <%= item.protein.round(1) %>g P
                     </div>
                     <div class="badge badge-accent badge-outline">
-                      <%= item.carbs %>g C
+                      <%= item.carbs.round(1) %>g C
                     </div>
                     <div class="badge badge-warning badge-outline">
-                      <%= item.fats %>g F
+                      <%= item.fats.round(1) %>g F
                     </div>
                   </div>
                 </div>

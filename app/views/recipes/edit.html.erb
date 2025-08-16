@@ -1,0 +1,238 @@
+<div class="min-h-screen bg-gradient-to-br from-base-100 to-base-200 pb-20">
+  <!-- Header Section -->
+  <div class="hero bg-gradient-to-r from-warning to-accent text-warning-content py-6 sm:py-8">
+    <div class="hero-content text-center max-w-4xl px-4">
+      <div class="w-full">
+        <h1 class="text-2xl sm:text-3xl font-bold mb-4 transition-all duration-700 ease-out animate-fade-in-down" data-controller="heading-animation">Edit Recipe</h1>
+        <p class="text-base sm:text-lg opacity-90">Update your culinary creation</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 py-6 max-w-4xl">
+    <%= form_with model: @recipe, local: true, class: "space-y-6" do |form| %>
+      <% if @recipe.errors.any? %>
+        <div class="alert alert-error">
+          <svg class="w-6 h-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div>
+            <h3 class="font-bold">Please fix the following errors:</h3>
+            <ul class="mt-2 list-disc list-inside">
+              <% @recipe.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Basic Info Card -->
+      <div class="card bg-base-100 shadow-lg transition-all duration-500 ease-out hover:shadow-xl animate-fade-in-up">
+        <div class="card-body">
+          <h2 class="card-title text-xl mb-4 transition-all duration-600 ease-out">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Basic Information
+          </h2>
+          
+          <div class="space-y-4">
+            <div class="form-control">
+              <%= form.label :name, class: "label" do %>
+                <span class="label-text font-medium">Recipe Name</span>
+              <% end %>
+              <%= form.text_field :name, class: "input input-bordered w-full" %>
+            </div>
+
+            <div class="form-control">
+              <%= form.label :description, class: "label" do %>
+                <span class="label-text font-medium">Description</span>
+              <% end %>
+              <%= form.text_area :description, rows: 3, class: "textarea textarea-bordered" %>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="form-control">
+                <%= form.label :servings, class: "label" do %>
+                  <span class="label-text font-medium">Servings</span>
+                <% end %>
+                <%= form.number_field :servings, min: 1, class: "input input-bordered" %>
+              </div>
+              <div class="form-control">
+                <%= form.label :prep_time_minutes, class: "label" do %>
+                  <span class="label-text font-medium">Prep Time (min)</span>
+                <% end %>
+                <%= form.number_field :prep_time_minutes, min: 0, class: "input input-bordered" %>
+              </div>
+              <div class="form-control">
+                <%= form.label :cook_time_minutes, class: "label" do %>
+                  <span class="label-text font-medium">Cook Time (min)</span>
+                <% end %>
+                <%= form.number_field :cook_time_minutes, min: 0, class: "input input-bordered" %>
+              </div>
+            </div>
+
+            <div class="form-control">
+              <label class="label cursor-pointer justify-start gap-3">
+                <%= form.check_box :public, class: "checkbox checkbox-primary" %>
+                <span class="label-text">Make this recipe public (others can copy it)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ingredients Card -->
+      <div class="card bg-base-100 shadow-lg transition-all duration-500 ease-out hover:shadow-xl animate-fade-in-up">
+        <div class="card-body">
+          <h2 class="card-title text-xl mb-4 transition-all duration-600 ease-out">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h2m0 0h2m-2 0v6a2 2 0 002 2h6a2 2 0 002-2v-6a2 2 0 00-2-2h-6a2 2 0 00-2 2zm2-2V7a2 2 0 012-2h2a2 2 0 012 2v2"></path>
+            </svg>
+            Ingredients
+          </h2>
+          
+          <div id="ingredients-container" class="space-y-3">
+            <% @recipe_ingredients.each_with_index do |ingredient, index| %>
+              <div class="ingredient-row grid grid-cols-1 md:grid-cols-4 gap-3 p-4 bg-base-200 rounded-lg">
+                <div class="form-control">
+                  <select name="recipe_ingredients[][food_id]" class="select select-bordered food-select" required>
+                    <option value="">Select food...</option>
+                    <% Food.all.each do |food| %>
+                      <option value="<%= food.id %>" <%= 'selected' if food.id == ingredient.food_id %>><%= food.name %></option>
+                    <% end %>
+                  </select>
+                </div>
+                <div class="form-control">
+                  <input type="number" name="recipe_ingredients[][quantity]" placeholder="Quantity" step="0.1" min="0" value="<%= ingredient.quantity %>" class="input input-bordered" required>
+                </div>
+                <div class="form-control">
+                  <select name="recipe_ingredients[][unit]" class="select select-bordered">
+                    <% RecipeIngredient::UNITS.each do |unit| %>
+                      <option value="<%= unit %>" <%= 'selected' if unit == ingredient.unit %>><%= unit.humanize %></option>
+                    <% end %>
+                  </select>
+                </div>
+                <div class="form-control">
+                  <button type="button" class="btn btn-error remove-ingredient">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    Remove
+                  </button>
+                </div>
+              </div>
+            <% end %>
+            
+            <% if @recipe_ingredients.empty? %>
+              <div class="ingredient-row grid grid-cols-1 md:grid-cols-4 gap-3 p-4 bg-base-200 rounded-lg">
+                <div class="form-control">
+                  <select name="recipe_ingredients[][food_id]" class="select select-bordered food-select" required>
+                    <option value="">Select food...</option>
+                    <% Food.all.each do |food| %>
+                      <option value="<%= food.id %>"><%= food.name %></option>
+                    <% end %>
+                  </select>
+                </div>
+                <div class="form-control">
+                  <input type="number" name="recipe_ingredients[][quantity]" placeholder="Quantity" step="0.1" min="0" class="input input-bordered" required>
+                </div>
+                <div class="form-control">
+                  <select name="recipe_ingredients[][unit]" class="select select-bordered">
+                    <% RecipeIngredient::UNITS.each do |unit| %>
+                      <option value="<%= unit %>" <%= 'selected' if unit == 'grams' %>><%= unit.humanize %></option>
+                    <% end %>
+                  </select>
+                </div>
+                <div class="form-control">
+                  <button type="button" class="btn btn-error remove-ingredient">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    Remove
+                  </button>
+                </div>
+              </div>
+            <% end %>
+          </div>
+          
+          <div class="card-actions justify-start mt-4">
+            <button type="button" id="add-ingredient" class="btn btn-success">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Add Ingredient
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instructions Card -->
+      <div class="card bg-base-100 shadow-lg transition-all duration-500 ease-out hover:shadow-xl animate-fade-in-up">
+        <div class="card-body">
+          <h2 class="card-title text-xl mb-4 transition-all duration-600 ease-out">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Cooking Instructions
+          </h2>
+          
+          <div class="form-control">
+            <%= form.text_area :instructions, rows: 8, class: "textarea textarea-bordered" %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="card bg-base-100 shadow-lg transition-all duration-500 ease-out hover:shadow-xl animate-fade-in-up">
+        <div class="card-body">
+          <div class="card-actions justify-end gap-4">
+            <%= link_to @recipe, class: "btn btn-ghost" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+              Cancel
+            <% end %>
+            <%= form.submit "Update Recipe", class: "btn btn-warning" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Update Recipe
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const container = document.getElementById('ingredients-container');
+  const addButton = document.getElementById('add-ingredient');
+
+  addButton.addEventListener('click', function() {
+    const newRow = container.querySelector('.ingredient-row').cloneNode(true);
+    newRow.querySelectorAll('input, select').forEach(input => {
+      if (input.name && input.name.includes('food_id')) {
+        input.value = '';
+      } else if (input.name && input.name.includes('quantity')) {
+        input.value = '';
+      } else if (input.name && input.name.includes('unit')) {
+        input.value = 'grams';
+      }
+    });
+    container.appendChild(newRow);
+  });
+
+  container.addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-ingredient') || e.target.closest('.remove-ingredient')) {
+      if (container.querySelectorAll('.ingredient-row').length > 1) {
+        const row = e.target.closest('.ingredient-row');
+        if (row) row.remove();
+      }
+    }
+  });
+});
+</script>

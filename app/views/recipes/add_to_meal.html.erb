@@ -1,0 +1,213 @@
+<div class="min-h-screen bg-gradient-to-br from-base-100 to-base-200 pb-20">
+  <!-- Header Section -->
+  <div class="hero bg-gradient-to-r from-accent to-secondary text-accent-content py-6 sm:py-8">
+    <div class="hero-content text-center max-w-4xl px-4">
+      <div class="w-full">
+        <h1 class="text-2xl sm:text-3xl font-bold mb-4 transition-all duration-700 ease-out animate-fade-in-down" data-controller="heading-animation">Add Recipe to Meal</h1>
+        <p class="text-base sm:text-lg opacity-90">Choose when and how much to add to your daily nutrition</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 py-6 max-w-2xl">
+    <!-- Recipe Preview Card -->
+    <div class="card bg-base-100 shadow-lg mb-6 transition-all duration-500 ease-out hover:shadow-xl animate-fade-in-up">
+      <div class="card-body">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="avatar placeholder">
+            <div class="bg-primary text-primary-content rounded-full w-12">
+              <span class="text-lg">🍽️</span>
+            </div>
+          </div>
+          <div>
+            <h2 class="card-title text-xl"><%= @recipe.name %></h2>
+            <p class="text-base-content/70">Per serving: <%= @recipe.per_serving_calories.round(1) %> calories</p>
+          </div>
+        </div>
+        
+        <!-- Quick nutrition preview -->
+        <div class="grid grid-cols-4 gap-2" id="recipe-preview-nutrition">
+          <div class="stat bg-base-200 rounded-lg p-2 transition-all duration-300 ease-out">
+            <div class="stat-title text-xs">Calories</div>
+            <div class="stat-value text-sm text-primary" data-per-serving="<%= @recipe.per_serving_calories.round(1) %>">
+              <%= (@recipe.per_serving_calories * (@servings || 1)).round(1) %>
+            </div>
+          </div>
+          <div class="stat bg-base-200 rounded-lg p-2 transition-all duration-300 ease-out">
+            <div class="stat-title text-xs">Protein</div>
+            <div class="stat-value text-sm text-secondary" data-per-serving="<%= @recipe.per_serving_protein.round(1) %>">
+              <%= (@recipe.per_serving_protein * (@servings || 1)).round(1) %>g
+            </div>
+          </div>
+          <div class="stat bg-base-200 rounded-lg p-2 transition-all duration-300 ease-out">
+            <div class="stat-title text-xs">Carbs</div>
+            <div class="stat-value text-sm text-accent" data-per-serving="<%= @recipe.per_serving_carbs.round(1) %>">
+              <%= (@recipe.per_serving_carbs * (@servings || 1)).round(1) %>g
+            </div>
+          </div>
+          <div class="stat bg-base-200 rounded-lg p-2 transition-all duration-300 ease-out">
+            <div class="stat-title text-xs">Fats</div>
+            <div class="stat-value text-sm text-info" data-per-serving="<%= @recipe.per_serving_fats.round(1) %>">
+              <%= (@recipe.per_serving_fats * (@servings || 1)).round(1) %>g
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add to Meal Form -->
+    <div class="card bg-base-100 shadow-lg transition-all duration-500 ease-out hover:shadow-xl animate-fade-in-up">
+      <div class="card-body">
+        <h3 class="card-title text-lg mb-4 transition-all duration-600 ease-out">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Meal Details
+        </h3>
+
+        <%= form_with url: create_meal_from_recipe_path(@recipe), method: :post, local: true, class: "space-y-6" do |form| %>
+          <%= form.hidden_field :recipe_id, value: @recipe.id %>
+          
+          <div class="form-control">
+            <%= form.label :date, class: "label" do %>
+              <span class="label-text font-medium">Date</span>
+            <% end %>
+            <%= form.date_field :date, value: @date, class: "input input-bordered w-full" %>
+          </div>
+
+          <div class="form-control">
+            <%= form.label :meal_type, class: "label" do %>
+              <span class="label-text font-medium">Meal Type</span>
+            <% end %>
+            <%= form.select :meal_type, 
+                options_for_select(@meal_types.map { |type| [type.humanize, type] }), 
+                { prompt: "Select meal type" }, 
+                { class: "select select-bordered w-full" } %>
+          </div>
+
+          <div class="form-control">
+            <%= form.label :servings, class: "label" do %>
+              <span class="label-text font-medium">Number of Servings</span>
+            <% end %>
+            <%= form.number_field :servings, value: @servings || 1, step: 0.1, min: 0.1, 
+                class: "input input-bordered w-full" %>
+            <div class="label">
+              <span class="label-text-alt">How many servings of this recipe?</span>
+            </div>
+          </div>
+
+          <!-- Nutrition Preview -->
+          <div class="card bg-base-200">
+            <div class="card-body p-4">
+              <h4 class="font-medium mb-3">Nutrition Preview (Total)</h4>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="nutrition-preview">
+                <div class="stat bg-base-100 rounded-lg p-3">
+                  <div class="stat-title text-xs">Calories</div>
+                  <div class="stat-value text-sm text-primary" data-per-serving="<%= @recipe.per_serving_calories.round(1) %>">
+                    <%= (@recipe.per_serving_calories * (@servings || 1)).round(1) %>
+                  </div>
+                </div>
+                <div class="stat bg-base-100 rounded-lg p-3">
+                  <div class="stat-title text-xs">Protein</div>
+                  <div class="stat-value text-sm text-secondary" data-per-serving="<%= @recipe.per_serving_protein.round(1) %>">
+                    <%= (@recipe.per_serving_protein * (@servings || 1)).round(1) %>g
+                  </div>
+                </div>
+                <div class="stat bg-base-100 rounded-lg p-3">
+                  <div class="stat-title text-xs">Carbs</div>
+                  <div class="stat-value text-sm text-accent" data-per-serving="<%= @recipe.per_serving_carbs.round(1) %>">
+                    <%= (@recipe.per_serving_carbs * (@servings || 1)).round(1) %>g
+                  </div>
+                </div>
+                <div class="stat bg-base-100 rounded-lg p-3">
+                  <div class="stat-title text-xs">Fats</div>
+                  <div class="stat-value text-sm text-info" data-per-serving="<%= @recipe.per_serving_fats.round(1) %>">
+                    <%= (@recipe.per_serving_fats * (@servings || 1)).round(1) %>g
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-actions justify-end gap-4 pt-4">
+            <%= link_to @recipe, class: "btn btn-ghost" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+              Cancel
+            <% end %>
+            <%= form.submit "Add to Meal", class: "btn btn-primary" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Add to Meal
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const servingsInput = document.querySelector('input[name="servings"]');
+  const nutritionPreview = document.getElementById('nutrition-preview');
+  const recipePreviewNutrition = document.getElementById('recipe-preview-nutrition');
+  
+  function updateNutritionValues(servings) {
+    // Update both nutrition preview sections
+    const sections = [nutritionPreview, recipePreviewNutrition];
+    
+    sections.forEach(section => {
+      if (section) {
+        section.querySelectorAll('[data-per-serving]').forEach(element => {
+          const perServing = parseFloat(element.dataset.perServing);
+          const total = (perServing * servings).toFixed(1);
+          
+          // Add smooth transition effect
+          element.style.transform = 'scale(1.1)';
+          element.style.transition = 'all 0.2s ease-out';
+          
+          setTimeout(() => {
+            if (element.textContent.includes('g')) {
+              element.textContent = total + 'g';
+            } else {
+              element.textContent = total;
+            }
+            
+            // Return to normal scale
+            element.style.transform = 'scale(1)';
+          }, 100);
+        });
+      }
+    });
+  }
+  
+  if (servingsInput) {
+    // Update on input change
+    servingsInput.addEventListener('input', function() {
+      const servings = parseFloat(this.value) || 1;
+      updateNutritionValues(servings);
+    });
+    
+    // Update on blur (when user finishes typing)
+    servingsInput.addEventListener('blur', function() {
+      const servings = parseFloat(this.value) || 1;
+      updateNutritionValues(servings);
+    });
+    
+    // Update on arrow key changes
+    servingsInput.addEventListener('change', function() {
+      const servings = parseFloat(this.value) || 1;
+      updateNutritionValues(servings);
+    });
+    
+    // Initialize with current value
+    const initialServings = parseFloat(servingsInput.value) || 1;
+    if (initialServings !== 1) {
+      updateNutritionValues(initialServings);
+    }
+  }
+});
+</script>

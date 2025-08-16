@@ -10,6 +10,8 @@ class User < ApplicationRecord
   has_one :user_detail, dependent: :destroy
   has_one :diet_goal, dependent: :destroy
   has_many :meals, dependent: :destroy
+  has_many :recipes, dependent: :destroy
+  has_many :recipe_copies, dependent: :destroy
 
   accepts_nested_attributes_for :user_detail, allow_destroy: true
 

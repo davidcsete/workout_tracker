@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_11_103038) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_15_000004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -67,8 +67,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_103038) do
     t.integer "grams"
     t.bigint "food_id"
     t.date "consumed_at"
+    t.bigint "recipe_id"
+    t.decimal "recipe_servings", precision: 8, scale: 2
     t.index ["food_id"], name: "index_food_items_on_food_id"
     t.index ["meal_id"], name: "index_food_items_on_meal_id"
+    t.index ["recipe_id"], name: "index_food_items_on_recipe_id"
   end
 
   create_table "foods", force: :cascade do |t|
@@ -104,6 +107,51 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_103038) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_meals_on_user_id"
+  end
+
+  create_table "recipe_copies", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "original_recipe_id", null: false
+    t.bigint "copied_recipe_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["copied_recipe_id"], name: "index_recipe_copies_on_copied_recipe_id"
+    t.index ["original_recipe_id"], name: "index_recipe_copies_on_original_recipe_id"
+    t.index ["user_id", "original_recipe_id"], name: "index_recipe_copies_on_user_id_and_original_recipe_id", unique: true
+    t.index ["user_id"], name: "index_recipe_copies_on_user_id"
+  end
+
+  create_table "recipe_ingredients", force: :cascade do |t|
+    t.bigint "recipe_id", null: false
+    t.bigint "food_id", null: false
+    t.decimal "quantity", precision: 8, scale: 2, null: false
+    t.string "unit", default: "grams"
+    t.integer "order_index", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["food_id"], name: "index_recipe_ingredients_on_food_id"
+    t.index ["recipe_id", "order_index"], name: "index_recipe_ingredients_on_recipe_id_and_order_index"
+    t.index ["recipe_id"], name: "index_recipe_ingredients_on_recipe_id"
+  end
+
+  create_table "recipes", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.text "instructions"
+    t.integer "servings", default: 1
+    t.integer "prep_time_minutes"
+    t.integer "cook_time_minutes"
+    t.bigint "user_id", null: false
+    t.boolean "public", default: false
+    t.decimal "total_calories", precision: 8, scale: 2
+    t.decimal "total_protein", precision: 8, scale: 2
+    t.decimal "total_carbs", precision: 8, scale: 2
+    t.decimal "total_fats", precision: 8, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_recipes_on_name"
+    t.index ["user_id", "public"], name: "index_recipes_on_user_id_and_public"
+    t.index ["user_id"], name: "index_recipes_on_user_id"
   end
 
   create_table "user_details", force: :cascade do |t|
@@ -170,7 +218,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_103038) do
   add_foreign_key "exercise_weekdays", "weekdays"
   add_foreign_key "food_items", "foods"
   add_foreign_key "food_items", "meals"
+  add_foreign_key "food_items", "recipes"
   add_foreign_key "meals", "users"
+  add_foreign_key "recipe_copies", "recipes", column: "copied_recipe_id"
+  add_foreign_key "recipe_copies", "recipes", column: "original_recipe_id"
+  add_foreign_key "recipe_copies", "users"
+  add_foreign_key "recipe_ingredients", "foods"
+  add_foreign_key "recipe_ingredients", "recipes"
+  add_foreign_key "recipes", "users"
   add_foreign_key "user_details", "goals"
   add_foreign_key "user_details", "lifestyles"
   add_foreign_key "user_details", "users"

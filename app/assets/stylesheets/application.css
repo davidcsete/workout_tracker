@@ -190,3 +190,138 @@ body, html {
     animation: heading-fade-in-large 0.7s ease-out forwards;
     animation-delay: 0.1s;
   }
+/*
+ Custom Recipe Page Animations */
+@keyframes fade-in-up {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes fade-in-down {
+  from { 
+    opacity: 0; 
+    transform: translateY(-20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes fade-in-left {
+  from { 
+    opacity: 0; 
+    transform: translateX(-20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0); 
+  }
+}
+
+@keyframes fade-in-right {
+  from { 
+    opacity: 0; 
+    transform: translateX(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0); 
+  }
+}
+
+/* Animation Classes */
+.animate-fade-in-up {
+  opacity: 0;
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-fade-in-down {
+  opacity: 0;
+  animation: fade-in-down 0.7s ease-out forwards;
+}
+
+.animate-fade-in-left {
+  opacity: 0;
+  animation: fade-in-left 0.6s ease-out forwards;
+}
+
+.animate-fade-in-right {
+  opacity: 0;
+  animation: fade-in-right 0.6s ease-out forwards;
+}
+
+/* Staggered animations for multiple elements */
+.animate-fade-in-up:nth-child(1) { animation-delay: 0.1s; }
+.animate-fade-in-up:nth-child(2) { animation-delay: 0.2s; }
+.animate-fade-in-up:nth-child(3) { animation-delay: 0.3s; }
+.animate-fade-in-up:nth-child(4) { animation-delay: 0.4s; }
+.animate-fade-in-up:nth-child(5) { animation-delay: 0.5s; }
+.animate-fade-in-up:nth-child(6) { animation-delay: 0.6s; }
+
+/* Enhanced hover effects for cards */
+.card:hover {
+  transform: translateY(-2px);
+}
+
+/* Smooth transitions for all interactive elements */
+.btn, .card, .stat, .badge, .input, .select, .textarea {
+  transition: all 0.3s ease-out;
+}
+
+/* Enhanced button hover effects */
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Smooth scale animations for interactive elements */
+.hover\:scale-105:hover {
+  transform: scale(1.05);
+}
+
+/* Enhanced shadow transitions */
+.hover\:shadow-xl:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Nutrition stat animations */
+.stat {
+  transition: all 0.4s ease-out;
+}
+
+.stat:hover {
+  transform: translateY(-3px) scale(1.02);
+}
+
+/* Recipe card specific animations */
+.recipe-card {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.recipe-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Ingredient list animations */
+.ingredient-item {
+  transition: all 0.3s ease-out;
+}
+
+.ingredient-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: translateX(5px);
+}
+
+/* Form input focus animations */
+.input:focus, .select:focus, .textarea:focus {
+  transform: scale(1.01);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}

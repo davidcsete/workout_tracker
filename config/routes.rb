@@ -14,6 +14,15 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :recipes do
+    member do
+      post :copy
+      get :add_to_meal
+    end
+  end
+
+  post "recipes/:recipe_id/add_to_meal", to: "recipes#create_meal_from_recipe", as: :create_meal_from_recipe
+
   resources :home, only: [ :index ]
   resources :user_details, only: [ :new, :create, :edit, :update ]
   get "dashboard/index"

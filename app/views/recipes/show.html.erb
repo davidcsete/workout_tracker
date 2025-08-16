@@ -1,0 +1,372 @@
+<div class="min-h-screen bg-gradient-to-br from-base-100 to-base-200 pb-20">
+  <!-- Header Section -->
+  <div class="hero bg-gradient-to-r from-primary to-secondary text-primary-content py-6 sm:py-8">
+    <div class="hero-content text-center max-w-4xl px-4">
+      <div class="w-full">
+        <h1 class="text-2xl sm:text-3xl font-bold mb-2 transition-all duration-700 ease-out animate-fade-in-down" data-controller="heading-animation"><%= @recipe.name %></h1>
+        <div class="flex items-center justify-center gap-2 mb-4">
+          <div class="avatar placeholder">
+            <div class="bg-neutral text-neutral-content rounded-full w-8">
+              <span class="text-xs"><%= @recipe.user.email.first.upcase %></span>
+            </div>
+          </div>
+          <p class="text-base opacity-90">By <%= @recipe.user.email.split('@').first %></p>
+        </div>
+        
+        <!-- Action buttons -->
+        <div class="flex flex-wrap justify-center gap-2">
+          <% if @recipe.user == current_user %>
+            <%= link_to edit_recipe_path(@recipe), class: "btn btn-warning btn-sm" do %>
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              </svg>
+              Edit
+            <% end %>
+            <%= link_to recipe_path(@recipe), method: :delete, 
+                class: "btn btn-error btn-sm",
+                data: { confirm: "Are you sure you want to delete this recipe?" } do %>
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+              Delete
+            <% end %>
+          <% elsif @recipe.can_be_copied_by?(current_user) && !@recipe.copied_by?(current_user) %>
+            <%= link_to copy_recipe_path(@recipe), method: :post,
+                class: "btn btn-success btn-sm",
+                data: { confirm: "Copy this recipe to your collection?" } do %>
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+              </svg>
+              Copy Recipe
+            <% end %>
+          <% end %>
+          <%= link_to add_to_meal_recipe_path(@recipe), class: "btn btn-accent btn-sm" do %>
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Add to Meal
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 py-6 max-w-6xl">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Main Content -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Description -->
+        <% if @recipe.description.present? %>
+          <div class="card bg-base-100 shadow-lg transition-all duration-500 ease-out hover:shadow-xl animate-fade-in-up">
+            <div class="card-body">
+              <h2 class="card-title text-xl transition-all duration-600 ease-out">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+                </svg>
+                Description
+              </h2>
+              <p class="text-base-content/80"><%= @recipe.description %></p>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- Ingredients -->
+        <div class="card bg-base-100 shadow-lg transition-all duration-500 ease-out hover:shadow-xl animate-fade-in-up">
+          <div class="card-body">
+            <h2 class="card-title text-xl mb-4 transition-all duration-600 ease-out">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h2m0 0h2m-2 0v6a2 2 0 002 2h6a2 2 0 002-2v-6a2 2 0 00-2-2h-6a2 2 0 00-2 2zm2-2V7a2 2 0 012-2h2a2 2 0 012 2v2"></path>
+              </svg>
+              Ingredients
+              <span class="text-sm font-normal text-base-content/60 ml-2">(click to see nutrition)</span>
+            </h2>
+            <div class="space-y-2">
+              <% @recipe_ingredients.each_with_index do |ingredient, index| %>
+                <div class="ingredient-item cursor-pointer p-3 bg-base-200 rounded-lg hover:bg-base-300 transition-all duration-200 hover:shadow-md"
+                     data-ingredient-id="<%= ingredient.id %>"
+                     data-food-name="<%= ingredient.food.name %>"
+                     data-quantity="<%= ingredient.quantity %>"
+                     data-unit="<%= ingredient.unit %>"
+                     data-calories="<%= ingredient.food.calories %>"
+                     data-protein="<%= ingredient.food.protein %>"
+                     data-carbs="<%= ingredient.food.carbs %>"
+                     data-fats="<%= ingredient.food.fats %>">
+                  <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                      <div class="badge badge-primary badge-sm"><%= index + 1 %></div>
+                      <span class="font-medium"><%= ingredient.food.name %></span>
+                      <svg class="w-4 h-4 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                    </div>
+                    <div class="text-base-content/70 font-mono">
+                      <%= ingredient.quantity %> <%= ingredient.unit %>
+                    </div>
+                  </div>
+                  
+                  <!-- Expandable nutrition info (initially hidden) -->
+                  <div class="ingredient-nutrition mt-3 pt-3 border-t border-base-300 hidden">
+                    <div class="bg-base-100 p-3 rounded-lg">
+                      <div class="text-sm font-semibold text-base-content/80 mb-2 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        Nutrition per 100g:
+                      </div>
+                      <div class="nutrition-badge-grid mb-3">
+                        <div class="badge badge-primary badge-outline">
+                          <%= ingredient.food.calories %> kcal
+                        </div>
+                        <div class="badge badge-secondary badge-outline">
+                          <%= ingredient.food.protein %>g P
+                        </div>
+                        <div class="badge badge-accent badge-outline">
+                          <%= ingredient.food.carbs %>g C
+                        </div>
+                        <div class="badge badge-warning badge-outline">
+                          <%= ingredient.food.fats %>g F
+                        </div>
+                      </div>
+                      
+                      <div class="divider my-2"></div>
+                      
+                      <div class="text-sm font-semibold text-base-content/80 mb-2 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        In this recipe (<%= ingredient.quantity %><%= ingredient.unit %>):
+                      </div>
+                      <div class="nutrition-badge-grid">
+                        <% 
+                          multiplier = ingredient.quantity / 100.0
+                          recipe_calories = (ingredient.food.calories * multiplier).round(1)
+                          recipe_protein = (ingredient.food.protein * multiplier).round(1)
+                          recipe_carbs = (ingredient.food.carbs * multiplier).round(1)
+                          recipe_fats = (ingredient.food.fats * multiplier).round(1)
+                        %>
+                        <div class="badge badge-primary">
+                          <%= recipe_calories %> kcal
+                        </div>
+                        <div class="badge badge-secondary">
+                          <%= recipe_protein %>g P
+                        </div>
+                        <div class="badge badge-accent">
+                          <%= recipe_carbs %>g C
+                        </div>
+                        <div class="badge badge-warning">
+                          <%= recipe_fats %>g F
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Instructions -->
+        <% if @recipe.instructions.present? %>
+          <div class="card bg-base-100 shadow-lg transition-all duration-500 ease-out hover:shadow-xl animate-fade-in-up">
+            <div class="card-body">
+              <h2 class="card-title text-xl mb-4 transition-all duration-600 ease-out">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Instructions
+              </h2>
+              <div class="prose max-w-none">
+                <div class="bg-base-200 p-4 rounded-lg">
+                  <p class="whitespace-pre-line text-base-content/80"><%= @recipe.instructions %></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="lg:col-span-1 space-y-6">
+        <!-- Recipe Info -->
+        <div class="card bg-base-100 shadow-lg transition-all duration-500 ease-out hover:shadow-xl animate-fade-in-up">
+          <div class="card-body">
+            <h3 class="card-title text-lg transition-all duration-600 ease-out">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Recipe Info
+            </h3>
+            
+            <div class="space-y-4">
+              <div class="stat bg-base-200 rounded-lg p-3">
+                <div class="stat-title text-xs">Servings</div>
+                <div class="stat-value text-lg text-primary"><%= @recipe.servings %></div>
+              </div>
+              
+              <% if @recipe.prep_time_minutes.present? %>
+                <div class="stat bg-base-200 rounded-lg p-3">
+                  <div class="stat-title text-xs">Prep Time</div>
+                  <div class="stat-value text-lg text-secondary"><%= @recipe.prep_time_minutes %> min</div>
+                </div>
+              <% end %>
+              
+              <% if @recipe.cook_time_minutes.present? %>
+                <div class="stat bg-base-200 rounded-lg p-3">
+                  <div class="stat-title text-xs">Cook Time</div>
+                  <div class="stat-value text-lg text-accent"><%= @recipe.cook_time_minutes %> min</div>
+                </div>
+              <% end %>
+              
+              <% if @recipe.total_time_minutes > 0 %>
+                <div class="stat bg-primary text-primary-content rounded-lg p-3">
+                  <div class="stat-title text-xs opacity-80">Total Time</div>
+                  <div class="stat-value text-lg"><%= @recipe.total_time_minutes %> min</div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nutrition (Per Serving) -->
+        <div class="card bg-base-100 shadow-lg transition-all duration-500 ease-out hover:shadow-xl animate-fade-in-up">
+          <div class="card-body">
+            <h3 class="card-title text-lg transition-all duration-600 ease-out">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+              Nutrition (Per Serving)
+            </h3>
+            
+            <div class="grid grid-cols-2 gap-3">
+              <div class="stat bg-primary text-primary-content rounded-lg p-3">
+                <div class="stat-title text-xs opacity-80">Calories</div>
+                <div class="stat-value text-lg"><%= @recipe.per_serving_calories.round(1) %></div>
+              </div>
+              <div class="stat bg-secondary text-secondary-content rounded-lg p-3">
+                <div class="stat-title text-xs opacity-80">Protein</div>
+                <div class="stat-value text-lg"><%= @recipe.per_serving_protein.round(1) %>g</div>
+              </div>
+              <div class="stat bg-accent text-accent-content rounded-lg p-3">
+                <div class="stat-title text-xs opacity-80">Carbs</div>
+                <div class="stat-value text-lg"><%= @recipe.per_serving_carbs.round(1) %>g</div>
+              </div>
+              <div class="stat bg-info text-info-content rounded-lg p-3">
+                <div class="stat-title text-xs opacity-80">Fats</div>
+                <div class="stat-value text-lg"><%= @recipe.per_serving_fats.round(1) %>g</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back button -->
+    <div class="mt-8">
+      <%= link_to recipes_path, class: "btn btn-ghost" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Back to Recipes
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<style>
+.ingredient-item {
+  transition: all 0.2s ease-out;
+}
+
+.ingredient-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ingredient-item.active {
+  background-color: hsl(var(--b3));
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ingredient-nutrition {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nutrition-badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 0.5rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const ingredientItems = document.querySelectorAll('.ingredient-item');
+  
+  ingredientItems.forEach(item => {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      const nutritionDiv = this.querySelector('.ingredient-nutrition');
+      const isCurrentlyVisible = !nutritionDiv.classList.contains('hidden');
+      
+      // Close all other nutrition panels
+      ingredientItems.forEach(otherItem => {
+        const otherNutrition = otherItem.querySelector('.ingredient-nutrition');
+        otherNutrition.classList.add('hidden');
+        otherItem.classList.remove('active');
+      });
+      
+      // Toggle current panel
+      if (!isCurrentlyVisible) {
+        nutritionDiv.classList.remove('hidden');
+        this.classList.add('active');
+        
+        // Scroll into view if needed
+        setTimeout(() => {
+          this.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'nearest' 
+          });
+        }, 100);
+      }
+    });
+    
+    // Add keyboard support
+    item.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this.click();
+      }
+    });
+    
+    // Make focusable for accessibility
+    item.setAttribute('tabindex', '0');
+    item.setAttribute('role', 'button');
+    item.setAttribute('aria-expanded', 'false');
+  });
+  
+  // Close nutrition panels when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.ingredient-item')) {
+      ingredientItems.forEach(item => {
+        const nutrition = item.querySelector('.ingredient-nutrition');
+        nutrition.classList.add('hidden');
+        item.classList.remove('active');
+        item.setAttribute('aria-expanded', 'false');
+      });
+    }
+  });
+});
+</script>
