@@ -5,43 +5,50 @@
   themes: all;
 }
 
-/* Page transition animations */
-@keyframes slide-in-right {
-  0% {
-    transform: translateX(100%);
-    opacity: 0.5;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slide-in-left {
-  0% {
-    transform: translateX(-100%);
-    opacity: 0.5;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-.animate-slide-in-right {
-  animation: slide-in-right 0.5s ease-out forwards !important;
-  background-color: rgba(255, 0, 0, 0.1) !important; /* Red tint for debugging */
-}
-
-.animate-slide-in-left {
-  animation: slide-in-left 0.5s ease-out forwards !important;
-  background-color: rgba(0, 0, 255, 0.1) !important; /* Blue tint for debugging */
-}
+/* Page transition animations - removed duplicate definitions */
 
 /* Ensure smooth transitions */
 body {
   overflow-x: hidden;
   position: relative;
+}
+
+/* Main content transitions - target main instead of body */
+main, #main-content {
+  transform: translateX(0); /* Establish transform context */
+  backface-visibility: hidden; /* Improve animation performance */
+  -webkit-backface-visibility: hidden;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Ensure main content can be animated */
+#main-content {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Ensure fixed elements stay fixed during transitions */
+.fixed, .drawer, .btm-nav {
+  z-index: 1000;
+  transform: translateZ(0); /* Force hardware acceleration */
+  position: fixed !important; /* Ensure they stay fixed */
+  will-change: auto; /* Prevent unnecessary compositing */
+}
+
+/* Specific navbar fixes */
+.drawer {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+.btm-nav {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
 }
 
 /* Mobile-specific improvements for workout plans */

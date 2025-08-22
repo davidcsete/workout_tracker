@@ -5,124 +5,211 @@
   if (window.pageTransitionsInitialized) return;
   window.pageTransitionsInitialized = true;
 
-  let lastNavigationDirection = "forward";
-  let navStack = JSON.parse(sessionStorage.getItem("navStack")) || [];
-  let currentIndex = sessionStorage.getItem("currentIndex");
+  let isBackNavigation = false;
+  let navigationDirection = "forward";
+  let navigationHistory = JSON.parse(
+    sessionStorage.getItem("pageTransitionHistory") || "[]"
+  );
+  let currentHistoryIndex = parseInt(
+    sessionStorage.getItem("pageTransitionIndex") || "0"
+  );
 
-  if (currentIndex === null) {
-    currentIndex = 0;
-    sessionStorage.setItem("currentIndex", currentIndex);
-    navStack.push(location.pathname);
-    sessionStorage.setItem("navStack", JSON.stringify(navStack));
-  }
+  console.log("Page transitions initialized");
+  console.log("Current history:", navigationHistory);
+  console.log("Current index:", currentHistoryIndex);
 
-  window.addEventListener("popstate", (_event) => {
-    let prevIndex = parseInt(sessionStorage.getItem("currentIndex"));
-    let newIndex = navStack.findIndex((path) => path === location.pathname);
-
-    if (newIndex > prevIndex) {
-      lastNavigationDirection = "forward";
-    } else if (newIndex < prevIndex) {
-      lastNavigationDirection = "back";
-    } else {
-      // Same page or reload - default to forward
-      lastNavigationDirection = "forward";
-    }
-    sessionStorage.setItem("currentIndex", newIndex);
+  // Method 1: Track navigation direction via popstate (browser back/forward)
+  window.addEventListener("popstate", () => {
+    isBackNavigation = true;
+    navigationDirection = "back";
+    console.log("Back navigation detected via popstate");
   });
 
-  let lastVisitTime = 0;
-  let lastVisitUrl = "";
+  // Method 2: Detect back navigation by comparing URLs and history
+  function detectNavigationDirection(targetUrl) {
+    const targetPath = new URL(targetUrl).pathname;
+    const currentPath = window.location.pathname;
 
-  document.addEventListener("turbo:before-visit", (event) => {
-    const now = Date.now();
-    const targetUrl = event.detail.url;
+    console.log("Detecting direction:", {
+      currentPath,
+      targetPath,
+      history: navigationHistory,
+      index: currentHistoryIndex,
+    });
 
-    // Prevent rapid duplicate visits to the same URL
-    if (now - lastVisitTime < 300 && targetUrl === lastVisitUrl) {
-      event.preventDefault();
-      return;
+    // Check if target URL exists in our history before current position
+    const targetIndex = navigationHistory.indexOf(targetPath);
+
+    if (targetIndex !== -1 && targetIndex < currentHistoryIndex) {
+      console.log(
+        "Back navigation detected: target URL found earlier in history"
+      );
+      return "back";
     }
 
-    lastVisitTime = now;
-    lastVisitUrl = targetUrl;
+    // Check if we're going to a parent route (shorter path)
+    if (
+      targetPath.length < currentPath.length &&
+      currentPath.startsWith(targetPath)
+    ) {
+      console.log("Back navigation detected: going to parent route");
+      return "back";
+    }
 
-    // Check if this is a back navigation by looking at the URL
-    const currentPath = location.pathname;
-    const targetPath = new URL(targetUrl).pathname;
+    // Check for common back navigation patterns
+    const backPatterns = [
+      /\/\d+$/, // from /items/123 to /items
+      /\/edit$/, // from /items/edit to /items
+      /\/new$/, // from /items/new to /items
+      /\/show$/, // from /items/show to /items
+    ];
 
-    const currentIndex = navStack.indexOf(currentPath);
-    const targetIndex = navStack.indexOf(targetPath);
-
-    if (targetIndex !== -1 && targetIndex < currentIndex) {
-      lastNavigationDirection = "back";
-    } else {
-      lastNavigationDirection = "forward";
-      // Add new path to stack if it's not already there
-      if (targetIndex === -1) {
-        navStack.push(targetPath);
-        sessionStorage.setItem("navStack", JSON.stringify(navStack));
+    for (const pattern of backPatterns) {
+      if (pattern.test(currentPath) && !pattern.test(targetPath)) {
+        console.log("Back navigation detected: pattern match");
+        return "back";
       }
     }
-  });
 
-  let lastTransitionTime = 0;
-  let lastTransitionUrl = "";
-  let isTransitioning = false;
+    return "forward";
+  }
 
-  document.addEventListener("turbo:render", (event) => {
-    const now = Date.now();
-    const currentUrl = window.location.href;
+  // Method 3: Track navigation history manually
+  function updateNavigationHistory(url) {
+    const path = new URL(url).pathname;
 
-    // Prevent multiple transitions from running simultaneously
-    if (isTransitioning) {
-      return;
+    if (navigationDirection === "back") {
+      // Going back - update index but don't modify history
+      const targetIndex = navigationHistory.indexOf(path);
+      if (targetIndex !== -1) {
+        currentHistoryIndex = targetIndex;
+      }
+    } else {
+      // Going forward - add to history or update index
+      const existingIndex = navigationHistory.indexOf(path);
+      if (existingIndex !== -1) {
+        currentHistoryIndex = existingIndex;
+      } else {
+        // New page - add to history
+        navigationHistory = navigationHistory.slice(0, currentHistoryIndex + 1);
+        navigationHistory.push(path);
+        currentHistoryIndex = navigationHistory.length - 1;
+      }
     }
 
-    // Debounce: only apply transition if it's been more than 200ms since last transition
-    // OR if it's a different URL
-    if (now - lastTransitionTime < 200 && currentUrl === lastTransitionUrl) {
-      return;
-    }
-
-    isTransitioning = true;
-    lastTransitionTime = now;
-    lastTransitionUrl = currentUrl;
-
-    // Apply animation to the current body (after render)
-    const currentBody = document.body;
-
-    // Clear any existing animation classes
-    currentBody.classList.remove(
-      "animate-slide-in-left",
-      "animate-slide-in-right"
+    // Save to session storage
+    sessionStorage.setItem(
+      "pageTransitionHistory",
+      JSON.stringify(navigationHistory)
+    );
+    sessionStorage.setItem(
+      "pageTransitionIndex",
+      currentHistoryIndex.toString()
     );
 
-    // Apply the appropriate animation
-    if (lastNavigationDirection === "forward") {
-      currentBody.classList.add("animate-slide-in-right");
+    console.log("Updated history:", {
+      history: navigationHistory,
+      index: currentHistoryIndex,
+    });
+  }
+
+  // Reset back navigation flag on new visits and determine direction
+  document.addEventListener("turbo:before-visit", (event) => {
+    const targetUrl = event.detail.url;
+
+    console.log(
+      "turbo:before-visit fired, isBackNavigation:",
+      isBackNavigation
+    );
+    console.log("Target URL:", targetUrl);
+
+    if (!isBackNavigation) {
+      // Use URL analysis to detect back navigation
+      navigationDirection = detectNavigationDirection(targetUrl);
+      console.log("Navigation direction determined:", navigationDirection);
     } else {
-      currentBody.classList.add("animate-slide-in-left");
+      console.log("Confirmed back navigation via popstate");
     }
 
-    // Remove animation class after animation completes
-    setTimeout(() => {
-      currentBody.classList.remove(
-        "animate-slide-in-left",
-        "animate-slide-in-right"
-      );
-      isTransitioning = false; // Reset the flag
-    }, 400); // Slightly longer timeout to ensure animation completes
+    // Update our navigation history
+    updateNavigationHistory(targetUrl);
   });
 
+  // Apply transition immediately when page starts loading
+  document.addEventListener("turbo:before-render", (event) => {
+    console.log(
+      "turbo:before-render - applying transition, direction:",
+      navigationDirection
+    );
+
+    const newBody = event.detail.newBody;
+    const mainContent =
+      newBody.querySelector("#main-content") || newBody.querySelector("main");
+
+    if (mainContent) {
+      // Set initial state for animation based on direction
+      if (navigationDirection === "back") {
+        mainContent.style.transform = "translateX(-100%)";
+        mainContent.style.opacity = "0.8";
+        console.log("Set initial state for BACK navigation (slide from left)");
+      } else {
+        mainContent.style.transform = "translateX(100%)";
+        mainContent.style.opacity = "0.8";
+        console.log(
+          "Set initial state for FORWARD navigation (slide from right)"
+        );
+      }
+      mainContent.style.transition =
+        "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease";
+    }
+  });
+
+  // Animate in after render
+  document.addEventListener("turbo:render", () => {
+    console.log(
+      "turbo:render - animating in, direction was:",
+      navigationDirection
+    );
+
+    const mainContent =
+      document.querySelector("#main-content") || document.querySelector("main");
+
+    if (mainContent) {
+      // Trigger animation to final position
+      requestAnimationFrame(() => {
+        mainContent.style.transform = "translateX(0)";
+        mainContent.style.opacity = "1";
+        console.log(
+          "Animated to final position for",
+          navigationDirection,
+          "navigation"
+        );
+
+        // Clean up after animation
+        setTimeout(() => {
+          mainContent.style.transition = "";
+          mainContent.style.transform = "";
+          mainContent.style.opacity = "";
+
+          // Reset flags after animation completes
+          isBackNavigation = false;
+          navigationDirection = "forward";
+          console.log("Cleaned up transition styles and reset flags");
+        }, 450);
+      });
+    }
+  });
+
+  // Handle Turbo Stream removals with animation
   document.addEventListener("turbo:before-stream-render", (event) => {
     const stream = event.target;
     if (stream.action === "remove") {
       const element = document.getElementById(stream.target);
       if (element) {
-        element.classList.add("opacity-0", "translate-x-4");
-        element.classList.remove("transition-none");
-        setTimeout(() => element.remove(), 300); // Match Tailwind duration
+        element.style.transition = "all 0.3s ease-out";
+        element.style.opacity = "0";
+        element.style.transform = "translateX(20px)";
+        setTimeout(() => element.remove(), 300);
         event.preventDefault();
       }
     }
