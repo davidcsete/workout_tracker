@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :analytics, only: [ :index ]
   resources :diet_goals, except: [ :destroy ] do
     member do
       patch :regenerate

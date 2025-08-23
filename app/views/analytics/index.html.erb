@@ -1,0 +1,101 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-8">Analytics Dashboard</h1>
+  
+  <!-- Key Metrics -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="stat bg-base-200 rounded-lg p-6">
+      <div class="stat-title">Today's DAU</div>
+      <div class="stat-value text-primary"><%= @today_dau %></div>
+      <div class="stat-desc">
+        <% change = @today_dau - @yesterday_dau %>
+        <% if change > 0 %>
+          <span class="text-success">+<%= change %></span> from yesterday
+        <% elsif change < 0 %>
+          <span class="text-error"><%= change %></span> from yesterday
+        <% else %>
+          No change from yesterday
+        <% end %>
+      </div>
+    </div>
+    
+    <div class="stat bg-base-200 rounded-lg p-6">
+      <div class="stat-title">Weekly Active Users</div>
+      <div class="stat-value text-secondary"><%= @this_week_wau %></div>
+      <div class="stat-desc">This week</div>
+    </div>
+    
+    <div class="stat bg-base-200 rounded-lg p-6">
+      <div class="stat-title">Monthly Active Users</div>
+      <div class="stat-value text-accent"><%= @this_month_mau %></div>
+      <div class="stat-desc">This month</div>
+    </div>
+    
+    <div class="stat bg-base-200 rounded-lg p-6">
+      <div class="stat-title">Total Users</div>
+      <div class="stat-value"><%= User.count %></div>
+      <div class="stat-desc">All time</div>
+    </div>
+  </div>
+  
+  <!-- DAU Trend Chart -->
+  <div class="card bg-base-100 shadow-xl mb-8">
+    <div class="card-body">
+      <h2 class="card-title">Daily Active Users (Last 30 Days)</h2>
+      <canvas id="dauChart" width="400" height="200"></canvas>
+    </div>
+  </div>
+  
+  <!-- Top Active Users -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title">Most Active Users This Week</h2>
+      <div class="overflow-x-auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Page Views</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @top_users.each do |user, views| %>
+              <tr>
+                <td><%= user.email %></td>
+                <td><%= views %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const ctx = document.getElementById('dauChart').getContext('2d');
+  const dauData = <%= raw @dau_trend.to_json %>;
+  
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: dauData.map(d => d.date),
+      datasets: [{
+        label: 'Daily Active Users',
+        data: dauData.map(d => d.dau),
+        borderColor: 'rgb(75, 192, 192)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        tension: 0.1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+});
+</script>

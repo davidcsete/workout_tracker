@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_15_000004) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_23_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -154,6 +154,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_15_000004) do
     t.index ["user_id"], name: "index_recipes_on_user_id"
   end
 
+  create_table "user_activities", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.date "activity_date", null: false
+    t.integer "page_views", default: 0
+    t.integer "actions_count", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["activity_date"], name: "index_user_activities_on_activity_date"
+    t.index ["user_id", "activity_date"], name: "index_user_activities_on_user_id_and_activity_date", unique: true
+    t.index ["user_id"], name: "index_user_activities_on_user_id"
+  end
+
   create_table "user_details", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.integer "age"
@@ -226,6 +238,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_15_000004) do
   add_foreign_key "recipe_ingredients", "foods"
   add_foreign_key "recipe_ingredients", "recipes"
   add_foreign_key "recipes", "users"
+  add_foreign_key "user_activities", "users"
   add_foreign_key "user_details", "goals"
   add_foreign_key "user_details", "lifestyles"
   add_foreign_key "user_details", "users"
