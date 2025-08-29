@@ -67,8 +67,9 @@
           <%= render "shared/google_oauth_button" %>
         </div> 
         
-        <div class="text-center">
+        <div class="text-center space-y-2">
           <%= render "devise/shared/links" %>
+          <%= link_to "Back to Login", new_session_path(resource_name), class: "btn btn-ghost btn-sm" %>
         </div>
       </div>
     </div>
