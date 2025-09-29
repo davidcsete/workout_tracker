@@ -27,7 +27,8 @@
         <h3 class="font-bold text-sm leading-tight mb-1 truncate pr-2"><%= exercise.name %></h3>
         <div class="flex items-center gap-1 mb-2">
           <% latest_tracking = exercise.exercise_trackings.order(created_at: :desc).first %>
-          <% if latest_tracking %>
+          <% latest_tracking_condition = latest_tracking && current_user == latest_tracking.user %>
+          <% if latest_tracking_condition %>
             <div class="badge badge-success badge-xs text-xs">Last:</div>
             <span class="text-xs"><%= total_sessions = exercise.exercise_trackings.count %> sessions</span>
           <% else %>
@@ -38,7 +39,7 @@
       
       <!-- Quick Stats -->
       <div class="text-right flex-shrink-0">
-        <% if latest_tracking %>
+        <% if latest_tracking_condition %>
           <div class="text-sm font-bold text-primary"><%= latest_tracking.weight %>kg × <%= latest_tracking.reps %></div>
         <% end %>
       </div>
@@ -52,7 +53,7 @@
     <% end %>
 
     <!-- Progress Indicator -->
-    <% if latest_tracking && current_user == latest_tracking.user %>
+    <% if latest_tracking_condition %>
       <div class="mb-3">
         <div class="flex justify-between text-xs text-base-content/70 mb-1">
           <span>Recent Progress</span>
