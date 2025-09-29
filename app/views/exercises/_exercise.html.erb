@@ -52,7 +52,7 @@
     <% end %>
 
     <!-- Progress Indicator -->
-    <% if latest_tracking %>
+    <% if latest_tracking && current_user == latest_tracking.user %>
       <div class="mb-3">
         <div class="flex justify-between text-xs text-base-content/70 mb-1">
           <span>Recent Progress</span>
